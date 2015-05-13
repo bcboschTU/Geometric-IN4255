@@ -1,6 +1,7 @@
 package workshop;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.Arrays;
 
@@ -86,29 +87,21 @@ public class MyWorkshop extends PjWorkshop {
 	//ratio between the inscribed and the circumscribe circle
 	public double[] calculateShapeRegularity(){
 		PiVector [] elements = m_geom.getElements();
-		PdVector [] vertices = m_geom.getVertices();
-
-		for(int i = 0; i < elements.length; i++) {
-			for(int j = 0; j < elements[i].getSize(); j++) {
-				System.out.println("Elements, index: " + i + ", index in element: " + j + ", value: " + elements[i].getEntry(j));
-			}
-		}
-
-		int elementCounter = 0;
-		int pointCounter = 0;
+        double[] shapeRegularities = new double[elements.length];
 		for(int i = 0; i < m_geom.getNumElements(); i++){
-			double currentSmallestAngle = Double.MAX_VALUE;
-			for(int j = 0; j < elements[i].getSize(); j++) {
-				if(m_geom.getVertexAngle(i, j) < currentSmallestAngle) {
-					currentSmallestAngle = m_geom.getVertexAngle(i, j);
-				}
-				pointCounter++;
-			}
-			System.out.println("Element: index: " + i + ", angle: " + currentSmallestAngle);
 
-			elementCounter = pointCounter;
+			double currentSmallestAngle = Double.MAX_VALUE;
+            for (int j = 0; j < elements[i].getEntries().length ; j++) {
+                double angle = m_geom.getVertexAngle(i, j);
+                if (currentSmallestAngle > angle && angle != 0.0) {
+                    currentSmallestAngle = angle;
+                }
+            }
+            // Calculate shape regularity
+            double shapeRegularity = 2 / Math.sin(currentSmallestAngle);
+            shapeRegularities[i] = shapeRegularity;
 		}
-		return null;
+        return calculateStatistics(shapeRegularities);
 	}
 
 	//mean,min,max,std calculation from dataset
