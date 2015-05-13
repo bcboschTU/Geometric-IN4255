@@ -140,7 +140,14 @@ public class MyWorkshop extends PjWorkshop {
 	
 	//number of adjacent edges
 	public double[] calculateValence(){
-		return null;
+		PiVector vv = PgElementSet.getVertexValence(m_geom);
+		double[] result = new double[vv.getSize()];
+
+		for(int i = 0; i < vv.getSize(); i++) {
+			result[i] = vv.getEntry(i);
+		}
+
+		return calculateStatistics(result);
 	}
 	
 	//three angles of all triangles
