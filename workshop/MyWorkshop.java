@@ -137,6 +137,8 @@ public class MyWorkshop extends PjWorkshop {
 
 		return new double[]{mean, min, max, std};
 	}
+
+	// ---- Mesh Analysis
 	
 	//number of adjacent edges
 	public double[] calculateValence(){
@@ -167,5 +169,16 @@ public class MyWorkshop extends PjWorkshop {
 		}
 
 		return calculateStatistics(lengths);
+	}
+
+	// ---- Surface Analysis
+	
+	//genus of surface
+	public int calculateGenus(){
+		int V = m_geom.getNumVertices();
+		int E = m_geom.getNumEdges();
+		int F = m_geom.getNumElements();
+
+		return -((V-E+F / 2) - 1);
 	}
 }
