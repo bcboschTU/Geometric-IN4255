@@ -1,4 +1,16 @@
 *.class
+*.bat
+
+#folders
+dev6/
+dll/
+doc/
+images/
+jars/
+menu/
+rsrc/
+util/
+
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
