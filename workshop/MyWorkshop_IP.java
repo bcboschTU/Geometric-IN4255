@@ -147,10 +147,10 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 	}
 	
 	public void updateValues(double[] statistics){
-		//m_mean.setValue(statistics[0]);
-		//m_min.setValue(statistics[1]);
-		//m_max.setValue(statistics[2]);
-		//m_st.setValue(statistics[3]);
+		m_mean.setValue(statistics[0]);
+		m_min.setValue(statistics[1]);
+		m_max.setValue(statistics[2]);
+		m_sd.setValue(statistics[3]);
 	}
 	
 }

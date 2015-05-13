@@ -27,6 +27,8 @@ public class MyWorkshop extends PjWorkshop {
 		super.setGeometry(geom);
 		m_geom 		= (PgElementSet)super.m_geom;
 		m_geomSave 	= (PgElementSet)super.m_geomSave;
+		m_geom.allocateEdgeStars();
+		m_geomSave.allocateEdgeStars();
 	}
 	
 	public void init() {		
@@ -149,17 +151,14 @@ public class MyWorkshop extends PjWorkshop {
 	//length of all edges
 	public double[] calculateLengthEdges(){
 		//PsDebug.warning("")
-		/*
-        PdVector edges = m_geom.getEdgeSizes();
-		double[] m_date = edges.getEntries();
-		for(int i=0; i<m_date.size(); i++){
-			PgEdgeStar edge = m_geomSave.getEdge(i);
-			edge.toString();
+		double[] lengths = new double[m_geom.getNumEdges()];
+		System.out.println(m_geom.getEdgeStar(0));
+
+		for(int i=0; i< m_geom.getNumEdgeStars(); i++){
+			PgEdgeStar edgeStar = m_geom.getEdgeStar(i);
+			lengths[i] = edgeStar.getLength();
 		}
-         */
-		return null;
+
+		return calculateStatistics(lengths);
 	}
-	
-	
-	
 }
