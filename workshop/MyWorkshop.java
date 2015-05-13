@@ -172,11 +172,6 @@ public class MyWorkshop extends PjWorkshop {
 		int E = m_geom.getNumEdges();
 		int F = m_geom.getNumElements();
 
-
-		PsDebug.warning("V:" + V);
-		PsDebug.warning("E:" + E);
-		PsDebug.warning("F:" + F);
-
 		return -(((V-E+F) / 2) - 1);
 	}
 
