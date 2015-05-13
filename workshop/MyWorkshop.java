@@ -158,12 +158,17 @@ public class MyWorkshop extends PjWorkshop {
 
 		for(int i=0; i< m_geom.getNumEdgeStars(); i++){
 			PgEdgeStar edgeStar = m_geom.getEdgeStar(i);
-			lengths[i] = edgeStar.getLength();
+			lengths[i] = calculateDistance(m_geom.getVertex(edgeStar.getVertexInd(0)),m_geom.getVertex(edgeStar.getVertexInd(1)));
 		}
-
 		return calculateStatistics(lengths);
 	}
 
+	public double calculateDistance(PdVector point1,PdVector point2){
+		double x = Math.pow(point1.getEntry(0) - point2.getEntry(0), 2);
+		double y = Math.pow(point1.getEntry(1) - point2.getEntry(1),2);
+		double z = Math.pow(point1.getEntry(2) - point2.getEntry(2),2);
+		return Math.sqrt(x + y + z);
+	}
 	// ---- Surface Analysis
 	
 	//genus of surface
