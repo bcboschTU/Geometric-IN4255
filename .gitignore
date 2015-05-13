@@ -1,5 +1,6 @@
 *.class
 *.bat
+*.idea/
 
 #folders
 dev6/

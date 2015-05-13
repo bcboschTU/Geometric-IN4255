@@ -98,14 +98,7 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 		add(m_min.getInfoPanel());
 		add(m_max.getInfoPanel());
 		add(m_sd.getInfoPanel());
-		
-		
-		
-		
-		
-		
-		
-		
+
 		validate();
 	}
 	
