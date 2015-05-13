@@ -192,7 +192,7 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 	}
 
 	public void updateValueArea(double area){
-		m_genus.setValue(area);
+		m_area.setValue(area);
 	}
 	
 }
