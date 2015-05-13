@@ -82,8 +82,28 @@ public class MyWorkshop extends PjWorkshop {
 	
 	//ratio between the inscribed and the circumscribe circle
 	public double[] calculateShapeRegularity(){
-		int noe = m_geom.getNumElements();
-		for(int i=0; i<noe; i++){
+		PiVector [] elements = m_geom.getElements();
+		PdVector [] vertices = m_geom.getVertices();
+
+		for(int i = 0; i < elements.length; i++) {
+			for(int j = 0; j < elements[i].getSize(); j++) {
+				System.out.println("Elements, index: " + i + ", index in element: " + j + ", value: " + elements[i].getEntry(j));
+			}
+		}
+
+		int elementCounter = 0;
+		int pointCounter = 0;
+		for(int i = 0; i < m_geom.getNumElements(); i++){
+			double currentSmallestAngle = Double.MAX_VALUE;
+			for(int j = 0; j < elements[i].getSize(); j++) {
+				if(m_geom.getVertexAngle(i, j) < currentSmallestAngle) {
+					currentSmallestAngle = m_geom.getVertexAngle(i, j);
+				}
+				pointCounter++;
+			}
+			System.out.println("Element: index: " + i + ", angle: " + currentSmallestAngle);
+
+			elementCounter = pointCounter;
 		}
 		return null;
 	}
