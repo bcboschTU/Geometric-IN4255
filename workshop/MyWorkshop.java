@@ -101,12 +101,14 @@ public class MyWorkshop extends PjWorkshop {
 	//length of all edges
 	public double[] calculateLengthEdges(){
 		//PsDebug.warning("")
-		PdVector edges = m_geom.getEdgeSizes();
+		/*
+        PdVector edges = m_geom.getEdgeSizes();
 		double[] m_date = edges.getEntries();
 		for(int i=0; i<m_date.size(); i++){
 			PgEdgeStar edge = m_geomSave.getEdge(i);
 			edge.toString();
 		}
+         */
 		return null;
 	}
 	
