@@ -18,18 +18,26 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 
 	protected Button m_bMakeRandomElementColors;
 	protected Button m_bMakeRandomVertexColors;
-	
+
+	protected PuDouble m_xOff;
+
+
+	// Task 1
 	protected Button m_bShapeRegularty;
 	protected Button m_bValence;
 	protected Button m_bAngles;
 	protected Button m_bLengthEdges;
-	
-	protected PuDouble m_xOff;
-	
+
 	protected PuDouble m_mean;
 	protected PuDouble m_min;
 	protected PuDouble m_max;
 	protected PuDouble m_sd;
+
+	//Task 2
+	protected Button m_bGenus;
+	protected PuDouble m_genus;
+
+
 	
 	MyWorkshop m_ws;
 	
@@ -79,7 +87,7 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 		m_bAngles.addActionListener(this);
 		m_bLengthEdges = new Button("Length");
 		m_bLengthEdges.addActionListener(this);
-		Panel panel2 = new Panel(new FlowLayout(FlowLayout.CENTER));
+		Panel panel2 = new Panel(new FlowLayout(FlowLayout.LEFT));
 		panel2.add(m_bShapeRegularty);
 		panel2.add(m_bValence);
 		panel2.add(m_bAngles);
@@ -99,6 +107,15 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 		add(m_max.getInfoPanel());
 		add(m_sd.getInfoPanel());
 
+		addSubTitle("Surface Analyses:");
+		Panel panel3 = new Panel(new FlowLayout(FlowLayout.LEFT));
+		m_bGenus = new Button("Genus");
+		m_bGenus.addActionListener(this);
+		panel3.add(m_bGenus);
+		add(panel3);
+		m_genus= new PuDouble("Genus:");
+		m_sd.addUpdateListener(this);
+		add(m_genus.getInfoPanel());
 		validate();
 	}
 	
@@ -144,6 +161,12 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 			m_ws.m_geom.update(m_ws.m_geom);
 			return;
 		}
+		else if(source == m_bGenus){
+			updateValueGenus(m_ws.calculateGenus());
+			m_ws.m_geom.update(m_ws.m_geom);
+			return;
+		}
+
 	}
 	
 	public void updateValues(double[] statistics){
@@ -151,6 +174,10 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 		m_min.setValue(statistics[1]);
 		m_max.setValue(statistics[2]);
 		m_sd.setValue(statistics[3]);
+	}
+
+	public void updateValueGenus(int genus){
+		m_genus.setValue(genus);
 	}
 	
 }
