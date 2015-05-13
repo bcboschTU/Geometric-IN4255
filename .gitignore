@@ -11,7 +11,7 @@ jars/
 menu/
 rsrc/
 util/
-
+models/
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
