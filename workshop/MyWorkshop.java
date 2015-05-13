@@ -179,6 +179,16 @@ public class MyWorkshop extends PjWorkshop {
 		int E = m_geom.getNumEdges();
 		int F = m_geom.getNumElements();
 
-		return -((V-E+F / 2) - 1);
+
+		PsDebug.warning("V:" + V);
+		PsDebug.warning("E:" + E);
+		PsDebug.warning("F:" + F);
+
+		return -(((V-E+F) / 2) - 1);
+	}
+
+	//area of surface
+	public double calculateArea(){
+		return m_geom.getArea();
 	}
 }
