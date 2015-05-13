@@ -36,7 +36,8 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 	//Task 2
 	protected Button m_bGenus;
 	protected PuDouble m_genus;
-
+	protected Button m_bArea;
+	protected PuDouble m_area;
 
 	
 	MyWorkshop m_ws;
@@ -111,11 +112,17 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 		Panel panel3 = new Panel(new FlowLayout(FlowLayout.LEFT));
 		m_bGenus = new Button("Genus");
 		m_bGenus.addActionListener(this);
+		m_bArea= new Button("Area");
+		m_bArea.addActionListener(this);
 		panel3.add(m_bGenus);
+		panel3.add(m_bArea);
 		add(panel3);
 		m_genus= new PuDouble("Genus:");
-		m_sd.addUpdateListener(this);
+		m_area = new PuDouble("Area:");
+		m_genus.addUpdateListener(this);
+		m_area.addUpdateListener(this);
 		add(m_genus.getInfoPanel());
+		add(m_area.getInfoPanel());
 		validate();
 	}
 	
@@ -166,7 +173,11 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 			m_ws.m_geom.update(m_ws.m_geom);
 			return;
 		}
-
+		else if(source == m_bArea){
+			updateValueArea(m_ws.calculateArea());
+			m_ws.m_geom.update(m_ws.m_geom);
+			return;
+		}
 	}
 	
 	public void updateValues(double[] statistics){
@@ -178,6 +189,10 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 
 	public void updateValueGenus(int genus){
 		m_genus.setValue(genus);
+	}
+
+	public void updateValueArea(double area){
+		m_genus.setValue(area);
 	}
 	
 }
