@@ -2,6 +2,7 @@ package workshop;
 
 import java.awt.Color;
 import java.util.Random;
+import java.util.Arrays;
 
 import jv.geom.PgElementSet;
 import jv.project.PgGeometry;
@@ -106,6 +107,33 @@ public class MyWorkshop extends PjWorkshop {
 			elementCounter = pointCounter;
 		}
 		return null;
+	}
+
+	//mean,min,max,std calculation from dataset
+	public double[] calculateStatistics(double[] values) {
+		double min = Double.MAX_VALUE;
+		double max = Double.MIN_VALUE;
+		double sum = 0;
+
+		for(int i = 0; i < values.length; i++){
+			if(values[i] < min) {
+				min = values[i];
+			}
+			if(values[i] > max) {
+				max = values[i];
+			}
+			sum += values[i];
+		}
+
+		double mean = sum / values.length;
+		
+		double sumsq = 0;
+		for(int i = 0; i < values.length; i++){
+			sumsq += Math.pow(values[i] - mean, 2);
+		}
+		double std = Math.sqrt(sumsq / (values.length - 1));
+
+		return new double[]{mean, min, max, std};
 	}
 	
 	//number of adjacent edges
