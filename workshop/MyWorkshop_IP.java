@@ -43,6 +43,16 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 	protected Button m_bArea;
 	protected Label m_area;
     protected Label m_area_label;
+    protected Button m_bCurvature;    
+	protected Label m_meancurvature_label;
+	protected Label m_c_mean;
+    protected Label m_c_mean_label;
+	protected Label m_c_min;
+    protected Label m_c_min_label;
+	protected Label m_c_max;
+    protected Label m_c_max_label;
+	protected Label m_c_sd;
+    protected Label m_c_sd_label;
 
 
 	//Task3
@@ -136,8 +146,11 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 		m_bGenus.addActionListener(this);
 		m_bArea= new Button("Area");
 		m_bArea.addActionListener(this);
+		m_bCurvature= new Button("Mean Curvature");
+		m_bCurvature.addActionListener(this);
 		panel3.add(m_bGenus);
 		panel3.add(m_bArea);
+		panel3.add(m_bCurvature);
 		add(panel3);
 
         Panel panel4 = new Panel(new GridBagLayout());
@@ -155,8 +168,35 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
         panel4.add(m_area_label, left);
         m_area = new Label("");
         panel4.add(m_area, right);
+        m_meancurvature_label = new Label("Mean curvature:");
+        panel4.add(m_meancurvature_label, left);
+        panel4.add(new Label(""), right);
         add(panel4);
 
+        Panel meanCurvatureStatistics = new Panel(new GridBagLayout());
+        left = new GridBagConstraints();
+        left.anchor = GridBagConstraints.EAST;
+        right = new GridBagConstraints();
+        right.weightx = 2.0;
+        right.fill = GridBagConstraints.HORIZONTAL;
+        right.gridwidth = GridBagConstraints.REMAINDER;
+		m_c_mean = new Label("");
+        m_c_mean_label = new Label("Mean:");
+		m_c_min = new Label("");
+        m_c_min_label = new Label("Min:");
+		m_c_max = new Label("");
+        m_c_max_label = new Label("Max:");
+		m_c_sd = new Label("");
+        m_c_sd_label = new Label("Standard Deviation:");
+        meanCurvatureStatistics.add(m_c_mean_label, left);
+        meanCurvatureStatistics.add(m_c_mean, right);
+        meanCurvatureStatistics.add(m_c_min_label, left);
+        meanCurvatureStatistics.add(m_c_min, right);
+        meanCurvatureStatistics.add(m_c_max_label, left);
+        meanCurvatureStatistics.add(m_c_max, right);
+        meanCurvatureStatistics.add(m_c_sd_label, left);
+        meanCurvatureStatistics.add(m_c_sd, right);
+        add(meanCurvatureStatistics);
 
 		addSubTitle("Surface Smoothing:");
 		Panel panel5 = new Panel(new GridBagLayout());
@@ -220,6 +260,11 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 			m_ws.m_geom.update(m_ws.m_geom);
 			return;
 		}
+		else if(source == m_bCurvature){
+			updateCurvatureValues(m_ws.calculateMeanCurvature());
+			m_ws.m_geom.update(m_ws.m_geom);
+			return;
+		}
 		else if(source == m_bItterSmooth){
 			m_ws.surfaceSmoothIter(numIter);
 			m_ws.m_geom.update(m_ws.m_geom);
@@ -232,6 +277,13 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 		m_min.setText("" + new DecimalFormat("##.##").format(statistics[1]));
 		m_max.setText("" + new DecimalFormat("##.##").format(statistics[2]));
 		m_sd.setText("" + new DecimalFormat("##.##").format(statistics[3]));
+	}
+	
+	public void updateCurvatureValues(double[] statistics){
+		m_c_mean.setText("" + statistics[0]);
+		m_c_min.setText("" + statistics[1]);
+		m_c_max.setText("" + statistics[2]);
+		m_c_sd.setText("" + statistics[3]);
 	}
 
 	public void updateValueGenus(int genus){

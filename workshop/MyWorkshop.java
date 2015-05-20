@@ -241,6 +241,56 @@ public class MyWorkshop extends PjWorkshop {
 		return m_geom.getArea();
 	}
 
+	//absolute mean curvature
+	public double[] calculateMeanCurvature(){
+		double[] meanCurvature = new double[m_geom.getNumVertices()];
+
+		PiVector[] neighbours = m_geom.getNeighbours();
+        for(int i = 0; i < neighbours.length; i++){
+        	PdVector vertex = m_geom.getVertex(i);
+        	//PsDebug.warning("Vector: "+i);
+        	PdVector mcv = new PdVector();
+
+        	for(int j = 0; j < neighbours[i].getSize(); j++) {
+        		int vertIndex = neighbours[i].getEntry(j);
+        		ArrayList<Double> angles = new ArrayList<Double>();
+        		if(vertIndex < 0) {
+        			continue;
+        		}
+        		PdVector neighbour = m_geom.getVertex(vertIndex);
+        		for(int k = 0; k < neighbours[i].getSize(); k++) {
+	        		int vertIndex2 = neighbours[i].getEntry(k);
+	        		if(vertIndex2 < 0) {
+	        			continue;
+	        		}
+        			PdVector third = m_geom.getVertex(vertIndex2);
+        			//http://math.stackexchange.com/questions/361412/finding-the-angle-between-three-points
+        			PdVector ab = PdVector.subNew(third, vertex);
+        			PdVector bc = PdVector.subNew(neighbour, third);
+        			double dot = PdVector.dot(ab, bc);
+        			double angle = Math.acos(dot / (ab.length() * bc.length())); //in rad
+        			if(angle >= 0) {
+        				angles.add(angle);
+        				//PsDebug.warning("neighbour: "+j+" third: "+k+" angle: "+angle);
+        			}
+        		}
+
+        		PsDebug.warning("Angles: "+ angles.size());
+        		if(angles.size() == 2) {
+        			//Slide 39, lecture 3, sum((cotaij + cotbij) * (xi - xj))
+        			PdVector ximinusxj = PdVector.subNew(vertex, neighbour);
+        			ximinusxj.multScalar(((1/Math.tan(angles.get(0))) + (1/Math.tan(angles.get(1)))));
+        			mcv.add(ximinusxj);
+        		}
+        	}
+        	//Slide 39, lecture 3, 3/2area(star(xi))???
+        	mcv.multScalar(3 / 2);
+        	PsDebug.warning(i+": "+mcv.length());
+        	meanCurvature[i] = mcv.length();
+		}
+
+		return calculateStatistics(meanCurvature);
+	}
 
 	//iterative averaging
 	public void surfaceSmoothIter(int iters) {
