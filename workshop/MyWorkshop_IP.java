@@ -1,8 +1,6 @@
 package workshop;
 
-import java.awt.Button;
-import java.awt.FlowLayout;
-import java.awt.Panel;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -28,16 +26,22 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 	protected Button m_bAngles;
 	protected Button m_bLengthEdges;
 
-	protected PuDouble m_mean;
-	protected PuDouble m_min;
-	protected PuDouble m_max;
-	protected PuDouble m_sd;
+	protected Label m_mean;
+    protected Label m_mean_label;
+	protected Label m_min;
+    protected Label m_min_label;
+	protected Label m_max;
+    protected Label m_max_label;
+	protected Label m_sd;
+    protected Label m_sd_label;
 
 	//Task 2
 	protected Button m_bGenus;
-	protected PuDouble m_genus;
+	protected Label m_genus_label;
+	protected Label m_genus;
 	protected Button m_bArea;
-	protected PuDouble m_area;
+	protected Label m_area;
+    protected Label m_area_label;
 
 	
 	MyWorkshop m_ws;
@@ -73,7 +77,7 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 		add(panel1);
 		
 		m_xOff = new PuDouble("X Offset");
-		m_xOff.setDefBounds(-10,10,0.1,1);
+		m_xOff.setDefBounds(-10, 10, 0.1, 1);
 		m_xOff.addUpdateListener(this);
 		m_xOff.init();
 		add(m_xOff.getInfoPanel());
@@ -94,19 +98,32 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 		panel2.add(m_bAngles);
 		panel2.add(m_bLengthEdges);
 		add(panel2);
-		
-		m_mean= new PuDouble("Mean:");
-		m_mean.addUpdateListener(this);
-		m_min= new PuDouble("Min:");
-		m_min.addUpdateListener(this);
-		m_max= new PuDouble("Max:");
-		m_max.addUpdateListener(this);
-		m_sd= new PuDouble("Standard Deviation:");
-		m_sd.addUpdateListener(this);
-		add(m_mean.getInfoPanel());
-		add(m_min.getInfoPanel());
-		add(m_max.getInfoPanel());
-		add(m_sd.getInfoPanel());
+
+        Panel shapeStatistics = new Panel(new GridBagLayout());
+        GridBagConstraints left = new GridBagConstraints();
+        left.anchor = GridBagConstraints.EAST;
+        GridBagConstraints right = new GridBagConstraints();
+        right.weightx = 2.0;
+        right.fill = GridBagConstraints.HORIZONTAL;
+        right.gridwidth = GridBagConstraints.REMAINDER;
+		m_mean = new Label("");
+        m_mean_label = new Label("Mean:");
+		m_min = new Label("");
+        m_min_label = new Label("Min:");
+		m_max = new Label("");
+        m_max_label = new Label("Max:");
+		m_sd = new Label("");
+        m_sd_label = new Label("Standard Deviation:");
+        shapeStatistics.add(m_mean_label, left);
+        shapeStatistics.add(m_mean, right);
+        shapeStatistics.add(m_min_label, left);
+        shapeStatistics.add(m_min, right);
+        shapeStatistics.add(m_max_label, left);
+        shapeStatistics.add(m_max, right);
+        shapeStatistics.add(m_sd_label, left);
+        shapeStatistics.add(m_sd, right);
+
+        add(shapeStatistics);
 
 		addSubTitle("Surface Analyses:");
 		Panel panel3 = new Panel(new FlowLayout(FlowLayout.LEFT));
@@ -117,12 +134,24 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 		panel3.add(m_bGenus);
 		panel3.add(m_bArea);
 		add(panel3);
-		m_genus= new PuDouble("Genus:");
-		m_area = new PuDouble("Area:");
-		m_genus.addUpdateListener(this);
-		m_area.addUpdateListener(this);
-		add(m_genus.getInfoPanel());
-		add(m_area.getInfoPanel());
+
+        Panel panel4 = new Panel(new GridBagLayout());
+        left = new GridBagConstraints();
+        left.anchor = GridBagConstraints.EAST;
+        right = new GridBagConstraints();
+        right.weightx = 2.0;
+        right.fill = GridBagConstraints.HORIZONTAL;
+        right.gridwidth = GridBagConstraints.REMAINDER;
+        m_genus_label = new Label("Genus:");
+        panel4.add(m_genus_label, left);
+		m_genus = new Label("");
+        panel4.add(m_genus, right);
+        m_area_label = new Label("Area:");
+        panel4.add(m_area_label, left);
+        m_area = new Label("");
+        panel4.add(m_area, right);
+        add(panel4);
+
 		validate();
 	}
 	
@@ -181,18 +210,18 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 	}
 	
 	public void updateValues(double[] statistics){
-		m_mean.setValue(statistics[0]);
-		m_min.setValue(statistics[1]);
-		m_max.setValue(statistics[2]);
-		m_sd.setValue(statistics[3]);
+		m_mean.setText("" + statistics[0]);
+		m_min.setText("" + statistics[1]);
+		m_max.setText("" + statistics[2]);
+		m_sd.setText("" + statistics[3]);
 	}
 
 	public void updateValueGenus(int genus){
-		m_genus.setValue(genus);
+		m_genus.setText("" + genus);
 	}
 
 	public void updateValueArea(double area){
-		m_area.setValue(area);
+		m_area.setText("" + area);
 	}
 	
 }
