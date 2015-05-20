@@ -210,7 +210,7 @@ public class MyWorkshop extends PjWorkshop {
 	public double[] calculateLengthEdges(){
 		//PsDebug.warning("")
 		double[] lengths = new double[m_geom.getNumEdges()];
-		System.out.println(m_geom.getEdgeStar(0));
+		//System.out.println(m_geom.getEdgeStar(0));
 
 		for(int i=0; i< m_geom.getNumEdgeStars(); i++){
 			PgEdgeStar edgeStar = m_geom.getEdgeStar(i);
@@ -239,5 +239,54 @@ public class MyWorkshop extends PjWorkshop {
 	//area of surface
 	public double calculateArea(){
 		return m_geom.getArea();
+	}
+
+
+	//iterative averaging
+	public void surfaceSmoothIter(int iters) {
+		//PiVector[] neighbours = m_geom.getNeighbours();
+		System.out.println("num vertices: " + m_geomSave.getNumVertices());
+		System.out.println("num elements: " + m_geomSave.getNumElements());
+
+		int maxValence = (int)calculateStatistics(calculateValence())[2];
+		int[][] neighbours = new int[m_geomSave.getNumVertices()][maxValence];
+		int[] sizes = new int[m_geomSave.getNumVertices()];
+		for(int i = 0; i< sizes.length; i++){
+			sizes[i] = 0;
+		}
+
+		for(int i=0; i< m_geomSave.getNumEdgeStars(); i++){
+			PgEdgeStar edgeStar = m_geomSave.getEdgeStar(i);
+			int point1 = edgeStar.getVertexInd(0);
+			int point2 = edgeStar.getVertexInd(1);
+			int sizePoint1 = sizes[point1];
+			int sizePoint2 = sizes[point2];
+			neighbours[point1][sizePoint1] = point2;
+			neighbours[point2][sizePoint2] = point1;
+			sizes[point1]++;
+			sizes[point2]++;
+		}
+
+		for (int iter = 0; iter < iters; iter++) {
+
+			for (int i = 0; i < neighbours.length; i++) {
+				PdVector vertex1 = m_geomSave.getVertex(i);
+				PdVector temp = new PdVector(0, 0, 0);
+
+				for (int j = 0; j < sizes[i]; j++) {
+					int index = neighbours[i][j];
+					PdVector neighbour = m_geomSave.getVertex(index);
+					temp.add(neighbour);
+				}
+
+				double x = temp.getEntry(0) / sizes[i];
+				double y = temp.getEntry(1) / sizes[i];
+				double z = temp.getEntry(2) / sizes[i];
+				PdVector newVertex = new PdVector(x, y, z);
+				newVertex.min(vertex1);
+				m_geom.setVertex(i, newVertex);
+			}
+		}
+		m_geomSave = m_geom;
 	}
 }

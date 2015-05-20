@@ -44,6 +44,10 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 	protected Label m_area;
     protected Label m_area_label;
 
+
+	//Task3
+	protected Button m_bItterSmooth;
+	protected int numIter = 20;
 	
 	MyWorkshop m_ws;
 	
@@ -153,6 +157,14 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
         panel4.add(m_area, right);
         add(panel4);
 
+
+		addSubTitle("Surface Smoothing:");
+		Panel panel5 = new Panel(new GridBagLayout());
+		m_bItterSmooth = new Button("Smooth iterative");
+		m_bItterSmooth.addActionListener(this);
+		panel5.add(m_bItterSmooth);
+		add(panel5);
+
 		validate();
 	}
 	
@@ -205,6 +217,11 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 		}
 		else if(source == m_bArea){
 			updateValueArea(m_ws.calculateArea());
+			m_ws.m_geom.update(m_ws.m_geom);
+			return;
+		}
+		else if(source == m_bItterSmooth){
+			m_ws.surfaceSmoothIter(numIter);
 			m_ws.m_geom.update(m_ws.m_geom);
 			return;
 		}
