@@ -71,6 +71,33 @@ public class MyWorkshop extends PjWorkshop {
 		m_geom.showElementColorFromVertices(true);	
 		m_geom.showSmoothElementColors(true);
 	}
+
+	public void makeElementColors(double[] statistics, double[] entries) {
+		double mean = statistics[0];
+		double min = statistics[1];
+		double max = statistics[2];
+		double std = statistics[3];
+
+		double[] normalizedValues = new double[entries.length];
+
+		for(int i=0;i<entries.length;i++) {
+			normalizedValues[i] = (entries[i] - min) / max;
+		}
+
+		//assure that the color array is allocated
+		m_geom.assureElementColors();
+
+		Color color;
+
+		int noe = m_geom.getNumElements();
+		for(int i=0; i<noe; i++){
+			color = Color.getHSBColor((float)normalizedValues[i], 1.0f, 1.0f);
+			m_geom.setElementColor(i, color);
+		}
+		m_geom.showElementColorFromVertices(false);
+		m_geom.showElementColors(true);
+		m_geom.showSmoothElementColors(false);
+	}
 	
 	
 	public void setXOff(double xOff) {
@@ -101,7 +128,9 @@ public class MyWorkshop extends PjWorkshop {
             double shapeRegularity = 2 / Math.sin(Math.toRadians(currentSmallestAngle));
             shapeRegularities[i] = shapeRegularity;
 		}
-        return calculateStatistics(shapeRegularities);
+        double[] statistics = calculateStatistics(shapeRegularities);
+		makeElementColors(statistics, shapeRegularities);
+		return statistics;
 	}
 
 	//mean,min,max,std calculation from dataset
