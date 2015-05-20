@@ -98,7 +98,7 @@ public class MyWorkshop extends PjWorkshop {
                 }
             }
             // Calculate shape regularity
-            double shapeRegularity = 2 / Math.sin(currentSmallestAngle);
+            double shapeRegularity = 2 / Math.sin(Math.toRadians(currentSmallestAngle));
             shapeRegularities[i] = shapeRegularity;
 		}
         return calculateStatistics(shapeRegularities);

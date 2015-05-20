@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.text.DecimalFormat;
 
 import jv.number.PuDouble;
 
@@ -210,10 +211,10 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 	}
 	
 	public void updateValues(double[] statistics){
-		m_mean.setText("" + statistics[0]);
-		m_min.setText("" + statistics[1]);
-		m_max.setText("" + statistics[2]);
-		m_sd.setText("" + statistics[3]);
+		m_mean.setText("" + new DecimalFormat("##.##").format(statistics[0]));
+		m_min.setText("" + new DecimalFormat("##.##").format(statistics[1]));
+		m_max.setText("" + new DecimalFormat("##.##").format(statistics[2]));
+		m_sd.setText("" + new DecimalFormat("##.##").format(statistics[3]));
 	}
 
 	public void updateValueGenus(int genus){
@@ -221,7 +222,7 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 	}
 
 	public void updateValueArea(double area){
-		m_area.setText("" + area);
+		m_area.setText("" + new DecimalFormat("##.##").format(area));
 	}
 	
 }
