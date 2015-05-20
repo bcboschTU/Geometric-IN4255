@@ -131,6 +131,23 @@ public class MyWorkshop extends PjWorkshop {
 		return new double[]{mean, min, max, std};
 	}
 
+	//mean,min,max,std calculation from dataset
+	public double[] calculateStatistics(double[][] values) {
+		int total = 0;
+		for(int i = 0; i < values.length; i++){
+			total += values[i].length;
+		}
+		double[] newValues = new double[total];
+		int index = 0;
+		for(int i = 0; i < values.length; i++){
+			for(int j = 0; j < values[i].length; j++){
+				newValues[index++] = values[i][j];
+			}
+		}
+
+		return calculateStatistics(newValues);
+	}
+
 	// ---- Mesh Analysis
 	
 	//number of adjacent edges
@@ -147,7 +164,17 @@ public class MyWorkshop extends PjWorkshop {
 	
 	//three angles of all triangles
 	public double[] calculateAngles(){
-		return null;
+		PiVector [] elements = m_geom.getElements();
+        double[][] angles = new double[elements.length][];
+		for(int i = 0; i < elements.length; i++){
+			double[] triangle = new double[elements[i].getEntries().length];
+			for (int j = 0; j < elements[i].getEntries().length ; j++) {
+                double angle = m_geom.getVertexAngle(i, j);
+                triangle[j] = angle;
+            }
+            angles[i] = triangle;
+		}
+        return calculateStatistics(angles);
 	}
 	
 	//length of all edges
