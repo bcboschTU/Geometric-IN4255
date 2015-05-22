@@ -329,14 +329,21 @@ public class MyWorkshop extends PjWorkshop {
 					temp.add(neighbour);
 				}
 
-				double x = temp.getEntry(0) / sizes[i];
-				double y = temp.getEntry(1) / sizes[i];
-				double z = temp.getEntry(2) / sizes[i];
+				double scalar = 0.2;
+				double x = vertex1.getEntry(0) + scalar*((temp.getEntry(0) / sizes[i]) - vertex1.getEntry(0));
+				double y = vertex1.getEntry(1) + scalar*((temp.getEntry(1) / sizes[i]) - vertex1.getEntry(1));
+				double z = vertex1.getEntry(2) + scalar*((temp.getEntry(2) / sizes[i]) - vertex1.getEntry(2));
 				PdVector newVertex = new PdVector(x, y, z);
-				newVertex.min(vertex1);
+
+				//PdVector ret = vertex1;
+				//ret.add(newVertex);
 				m_geom.setVertex(i, newVertex);
 			}
 		}
 		m_geomSave = m_geom;
+	}
+
+	void meanCurvaturSmooth(int iters){
+
 	}
 }

@@ -58,6 +58,7 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 	//Task3
 	protected Button m_bItterSmooth;
 	protected int numIter = 20;
+	protected Button m_bMeanCurvatureSmooth;
 	
 	MyWorkshop m_ws;
 	
@@ -202,7 +203,10 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 		Panel panel5 = new Panel(new GridBagLayout());
 		m_bItterSmooth = new Button("Smooth iterative");
 		m_bItterSmooth.addActionListener(this);
+		m_bMeanCurvatureSmooth = new Button("Mean Curvature iterative");
+		m_bMeanCurvatureSmooth.addActionListener(this);
 		panel5.add(m_bItterSmooth);
+		panel5.add(m_bMeanCurvatureSmooth);
 		add(panel5);
 
 		validate();
@@ -269,6 +273,9 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 			m_ws.surfaceSmoothIter(numIter);
 			m_ws.m_geom.update(m_ws.m_geom);
 			return;
+		}
+		else if(source == m_bMeanCurvatureSmooth){
+			m_ws.meanCurvaturSmooth(numIter);
 		}
 	}
 	
