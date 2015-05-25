@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Arrays;
+import java.lang.Math;
 
 import jv.geom.PgElementSet;
 import jv.project.PgGeometry;
@@ -72,21 +73,18 @@ public class MyWorkshop extends PjWorkshop {
 		m_geom.showSmoothElementColors(true);
 	}
 
+	// Color elements based on logaritmic scale
 	public void makeElementColors(double[] entries) {
-		PsDebug.message("Hoi");
 		double[] statistics = calculateStatistics(entries);
-		double mean = statistics[0];
-		double min = statistics[1];
-		double max = statistics[2];
-		double std = statistics[3];
+		double min = Math.log10(statistics[1]);
+		min = Double.isNaN(min) || (min < 0) ? 0 : min;
+		double max = Math.log10(statistics[2]);
 
-		PsDebug.message("Ik");
 		double[] normalizedValues = new double[entries.length];
 
 		for(int i=0;i<entries.length;i++) {
-			normalizedValues[i] = (entries[i] - min) / max;
+			normalizedValues[i] = (Math.log10(entries[i]) - min) / (max-min);
 		}
-		PsDebug.message("Kom");
 
 		//assure that the color array is allocated
 		m_geom.assureElementColors();
@@ -94,16 +92,43 @@ public class MyWorkshop extends PjWorkshop {
 		Color color;
 
 		int noe = m_geom.getNumElements();
-		PsDebug.message("Tot");
 		for(int i=0; i<noe; i++){
 			color = Color.getHSBColor((float)normalizedValues[i], 1.0f, 1.0f);
 			m_geom.setElementColor(i, color);
 		}
-		PsDebug.message("Hier");
 		m_geom.showElementColorFromVertices(false);
 		m_geom.showElementColors(true);
 		m_geom.showSmoothElementColors(false);
-		PsDebug.message("Amen.");
+	}
+	
+	// Color vertices based on logaritmic scale
+	public void makeVertexColors(double[] entries) {
+		double[] statistics = calculateStatistics(entries);
+		double min = Math.log10(statistics[1]);
+		min = Double.isNaN(min) || (min < 0) ? 0 : min;
+		double max = Math.log10(statistics[2]);
+
+		double[] normalizedValues = new double[entries.length];
+
+		for(int i=0;i<entries.length;i++) {
+			normalizedValues[i] = (Math.log10(entries[i]) - min) / (max-min);
+		}
+
+		//assure that the color array is allocated
+		m_geom.assureVertexColors();
+		
+		Color color;
+		
+		int nov = m_geom.getNumVertices();
+		for(int i=0; i<nov; i++){
+			color = Color.getHSBColor((float)normalizedValues[i], 1.0f, 1.0f);
+			m_geom.setVertexColor(i, color);
+		}
+		
+		m_geom.showElementColors(true);	
+		m_geom.showVertexColors(true);
+		m_geom.showElementColorFromVertices(true);	
+		m_geom.showSmoothElementColors(true);
 	}
 	
 	
@@ -273,9 +298,23 @@ public class MyWorkshop extends PjWorkshop {
         		continue;
         	}
 
+        	double area = 0;
+        	PdVector previous = null;        	
+        	PdVector neighbour = null;
         	// For each neighbour of the vertex
         	for(int j = 0; j < sizes[i]; j++) {
-        		PdVector neighbour = m_geom.getVertex(neighbours[i][j]);
+        		if (previous != null) {
+        			double sideA = calculateDistance(vertex, previous);
+        			double sideB = calculateDistance(vertex, neighbour);
+        			double sideC = calculateDistance(neighbour, previous);
+        			double s = 0.5 * (sideA + sideB + sideC);
+        			area += Math.sqrt(s*(s-sideA)*(s-sideB)*(s-sideC));
+        		}
+        		if (neighbour != null) {
+        			previous = neighbour;
+        		}
+        		neighbour = m_geom.getVertex(neighbours[i][j]);
+
         		
         		//First create the sum vector
         		//Slide 39, lecture 3, sum((cotaij + cotbij) * (xi - xj))
@@ -284,8 +323,9 @@ public class MyWorkshop extends PjWorkshop {
         		mcv.add(ximinusxj);
         	}
         	//Now scale to the area of the vertex and its neighbours
-        	//Slide 39, lecture 3, 3/2area(star(xi))???
-        	mcv.multScalar(3 / 2);
+        	//Slide 39, lecture 3, 3/2area(star(xi))
+        	//PsDebug.message(area+"");
+        	mcv.multScalar(3 / (2*area));
 
         	//Save the absolute value of the mean curvature vector
         	double absmcv = Double.isNaN(mcv.length()) ? 0 : mcv.length();
@@ -294,7 +334,7 @@ public class MyWorkshop extends PjWorkshop {
 		}
 
 		PsDebug.message("Coloring object...");
-		makeElementColors(meanCurvature);
+		makeVertexColors(meanCurvature);
 		PsDebug.message("Done!");
 
 		return meanCurvature;
