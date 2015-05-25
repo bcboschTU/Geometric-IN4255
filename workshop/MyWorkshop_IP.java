@@ -99,7 +99,7 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 		m_xOff.init();
 		add(m_xOff.getInfoPanel());
 		
-		addSubTitle("Shape statistics:");
+		addSubTitle("Task 1 - Shape statistics:");
 		
 		m_bShapeRegularty = new Button("shape regularity");
 		m_bShapeRegularty.addActionListener(this);
@@ -142,7 +142,7 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 
         add(shapeStatistics);
 
-		addSubTitle("Surface Analyses:");
+		addSubTitle("Task 2 - Surface Analyses:");
 		Panel panel3 = new Panel(new FlowLayout(FlowLayout.LEFT));
 		m_bGenus = new Button("Genus");
 		m_bGenus.addActionListener(this);
@@ -200,7 +200,7 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
         meanCurvatureStatistics.add(m_c_sd, right);
         add(meanCurvatureStatistics);
 
-		addSubTitle("Surface Smoothing:");
+		addSubTitle("Task 3 - Surface Smoothing:");
 		Panel panel5 = new Panel(new GridBagLayout());
 		m_bItterSmooth = new Button("Smooth iterative");
 		m_bItterSmooth.addActionListener(this);
