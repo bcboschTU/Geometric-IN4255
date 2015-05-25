@@ -10,6 +10,7 @@ import java.text.DecimalFormat;
 import jv.number.PuDouble;
 
 import jv.object.PsConfig;
+import jv.object.PsDebug;
 import jv.object.PsUpdateIf;
 import jvx.project.PjWorkshop_IP;
 
@@ -70,7 +71,7 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 	
 	public void init() {
 		super.init();
-		setTitle("My Workshop");
+		setTitle("Geometric Modeling Practical 1");
 	}
 	
 	public String getNotice() {
@@ -235,22 +236,22 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 			return;
 		}
 		else if(source == m_bShapeRegularty){
-			updateValues(m_ws.calculateShapeRegularity());
+			updateValues(m_ws.calculateStatistics(m_ws.calculateShapeRegularity()));
 			m_ws.m_geom.update(m_ws.m_geom);
 			return;
 		}
 		else if(source == m_bValence){
-			updateValues(m_ws.calculateValence());
+			updateValues(m_ws.calculateStatistics(m_ws.calculateValence()));
 			m_ws.m_geom.update(m_ws.m_geom);
 			return;
 		}
 		else if(source == m_bAngles){
-			updateValues(m_ws.calculateAngles());
+			updateValues(m_ws.calculateStatistics(m_ws.calculateAngles()));
 			m_ws.m_geom.update(m_ws.m_geom);
 			return;
 		}
 		else if(source == m_bLengthEdges){
-			updateValues(m_ws.calculateLengthEdges());
+			updateValues(m_ws.calculateStatistics(m_ws.calculateLengthEdges()));
 			m_ws.m_geom.update(m_ws.m_geom);
 			return;
 		}
@@ -265,7 +266,7 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 			return;
 		}
 		else if(source == m_bCurvature){
-			updateCurvatureValues(m_ws.calculateMeanCurvature());
+			updateCurvatureValues(m_ws.calculateStatistics(m_ws.calculateMeanCurvature()));
 			m_ws.m_geom.update(m_ws.m_geom);
 			return;
 		}
@@ -287,10 +288,10 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 	}
 	
 	public void updateCurvatureValues(double[] statistics){
-		m_c_mean.setText("" + statistics[0]);
-		m_c_min.setText("" + statistics[1]);
-		m_c_max.setText("" + statistics[2]);
-		m_c_sd.setText("" + statistics[3]);
+		m_c_mean.setText("" + new DecimalFormat("##.##").format(statistics[0]));
+		m_c_min.setText("" + new DecimalFormat("##.##").format(statistics[1]));
+		m_c_max.setText("" + new DecimalFormat("##.##").format(statistics[2]));
+		m_c_sd.setText("" + new DecimalFormat("##.##").format(statistics[3]));
 	}
 
 	public void updateValueGenus(int genus){

@@ -19,7 +19,7 @@ public class MyWorkshop extends PjWorkshop {
 	PgElementSet m_geomSave;
 	
 	public MyWorkshop() {
-		super("My Workshop");
+		super("Geometric Modeling Practical 1");
 		init();
 	}
 	
@@ -72,17 +72,21 @@ public class MyWorkshop extends PjWorkshop {
 		m_geom.showSmoothElementColors(true);
 	}
 
-	public void makeElementColors(double[] statistics, double[] entries) {
+	public void makeElementColors(double[] entries) {
+		PsDebug.message("Hoi");
+		double[] statistics = calculateStatistics(entries);
 		double mean = statistics[0];
 		double min = statistics[1];
 		double max = statistics[2];
 		double std = statistics[3];
 
+		PsDebug.message("Ik");
 		double[] normalizedValues = new double[entries.length];
 
 		for(int i=0;i<entries.length;i++) {
 			normalizedValues[i] = (entries[i] - min) / max;
 		}
+		PsDebug.message("Kom");
 
 		//assure that the color array is allocated
 		m_geom.assureElementColors();
@@ -90,13 +94,16 @@ public class MyWorkshop extends PjWorkshop {
 		Color color;
 
 		int noe = m_geom.getNumElements();
+		PsDebug.message("Tot");
 		for(int i=0; i<noe; i++){
 			color = Color.getHSBColor((float)normalizedValues[i], 1.0f, 1.0f);
 			m_geom.setElementColor(i, color);
 		}
+		PsDebug.message("Hier");
 		m_geom.showElementColorFromVertices(false);
 		m_geom.showElementColors(true);
 		m_geom.showSmoothElementColors(false);
+		PsDebug.message("Amen.");
 	}
 	
 	
@@ -128,9 +135,10 @@ public class MyWorkshop extends PjWorkshop {
             double shapeRegularity = 2 / Math.sin(Math.toRadians(currentSmallestAngle));
             shapeRegularities[i] = shapeRegularity;
 		}
-        double[] statistics = calculateStatistics(shapeRegularities);
-		makeElementColors(statistics, shapeRegularities);
-		return statistics;
+
+		makeElementColors(shapeRegularities);
+		
+		return shapeRegularities;
 	}
 
 	//mean,min,max,std calculation from dataset
@@ -157,6 +165,11 @@ public class MyWorkshop extends PjWorkshop {
 		}
 		double std = Math.sqrt(sumsq / (values.length - 1));
 
+        //PsDebug.message("Min: "+min);
+        //PsDebug.message("Max: "+max);
+        //PsDebug.message("Mean: "+mean);
+        //PsDebug.message("Std: "+std);
+
 		return new double[]{mean, min, max, std};
 	}
 
@@ -182,17 +195,17 @@ public class MyWorkshop extends PjWorkshop {
 	//number of adjacent edges
 	public double[] calculateValence(){
 		PiVector vv = PgElementSet.getVertexValence(m_geom);
-		double[] result = new double[vv.getSize()];
+		double[] valence = new double[vv.getSize()];
 
 		for(int i = 0; i < vv.getSize(); i++) {
-			result[i] = vv.getEntry(i);
+			valence[i] = vv.getEntry(i);
 		}
 
-		return calculateStatistics(result);
+		return valence;
 	}
 	
 	//three angles of all triangles
-	public double[] calculateAngles(){
+	public double[][] calculateAngles(){
 		PiVector [] elements = m_geom.getElements();
         double[][] angles = new double[elements.length][];
 		for(int i = 0; i < elements.length; i++){
@@ -203,12 +216,11 @@ public class MyWorkshop extends PjWorkshop {
             }
             angles[i] = triangle;
 		}
-        return calculateStatistics(angles);
+        return angles;
 	}
 	
 	//length of all edges
 	public double[] calculateLengthEdges(){
-		//PsDebug.warning("")
 		double[] lengths = new double[m_geom.getNumEdges()];
 		//System.out.println(m_geom.getEdgeStar(0));
 
@@ -216,7 +228,7 @@ public class MyWorkshop extends PjWorkshop {
 			PgEdgeStar edgeStar = m_geom.getEdgeStar(i);
 			lengths[i] = calculateDistance(m_geom.getVertex(edgeStar.getVertexInd(0)),m_geom.getVertex(edgeStar.getVertexInd(1)));
 		}
-		return calculateStatistics(lengths);
+		return lengths;
 	}
 
 	public double calculateDistance(PdVector point1,PdVector point2){
@@ -243,70 +255,55 @@ public class MyWorkshop extends PjWorkshop {
 
 	//absolute mean curvature
 	public double[] calculateMeanCurvature(){
-		double[] meanCurvature = new double[m_geom.getNumVertices()];
+		NeighboursSizesPair nsp = createNeighbours();
+		int[][] neighbours = nsp.neighbours;
+		int[] sizes = nsp.sizes;
+		double[][] angles = calculateAngles();
 
-		PiVector[] neighbours = m_geom.getNeighbours();
+		double[] meanCurvature = new double[neighbours.length];
+
         for(int i = 0; i < neighbours.length; i++){
         	PdVector vertex = m_geom.getVertex(i);
-        	//PsDebug.warning("Vector: "+i);
         	PdVector mcv = new PdVector();
 
-        	for(int j = 0; j < neighbours[i].getSize(); j++) {
-        		int vertIndex = neighbours[i].getEntry(j);
-        		ArrayList<Double> angles = new ArrayList<Double>();
-        		if(vertIndex < 0) {
-        			continue;
-        		}
-        		PdVector neighbour = m_geom.getVertex(vertIndex);
-        		for(int k = 0; k < neighbours[i].getSize(); k++) {
-	        		int vertIndex2 = neighbours[i].getEntry(k);
-	        		if(vertIndex2 < 0) {
-	        			continue;
-	        		}
-        			PdVector third = m_geom.getVertex(vertIndex2);
-        			//http://math.stackexchange.com/questions/361412/finding-the-angle-between-three-points
-        			PdVector ab = PdVector.subNew(third, vertex);
-        			PdVector bc = PdVector.subNew(neighbour, third);
-        			double dot = PdVector.dot(ab, bc);
-        			double angle = Math.acos(dot / (ab.length() * bc.length())); //in rad
-        			if(angle >= 0) {
-        				angles.add(angle);
-        				//PsDebug.warning("neighbour: "+j+" third: "+k+" angle: "+angle);
-        			}
-        		}
+        	//PsDebug.message("Vector "+i+": "+angles[i].length+" angles");
+        	if(angles[i].length < 3) {
+        		continue;
+        	}
 
-        		PsDebug.warning("Angles: "+ angles.size());
-        		if(angles.size() == 2) {
-        			//Slide 39, lecture 3, sum((cotaij + cotbij) * (xi - xj))
-        			PdVector ximinusxj = PdVector.subNew(vertex, neighbour);
-        			ximinusxj.multScalar(((1/Math.tan(angles.get(0))) + (1/Math.tan(angles.get(1)))));
-        			mcv.add(ximinusxj);
-        		}
+        	for(int j = 0; j < sizes[i]; j++) {
+        		int vertIndex = neighbours[i][j];
+        		PdVector neighbour = m_geom.getVertex(vertIndex);
+        		
+        		//Slide 39, lecture 3, sum((cotaij + cotbij) * (xi - xj))
+        		PdVector ximinusxj = PdVector.subNew(vertex, neighbour);
+        		ximinusxj.multScalar(((1/Math.tan(angles[i][1])) + (1/Math.tan(angles[i][2]))));
+        		mcv.add(ximinusxj);
         	}
         	//Slide 39, lecture 3, 3/2area(star(xi))???
         	mcv.multScalar(3 / 2);
-        	PsDebug.warning(i+": "+mcv.length());
-        	meanCurvature[i] = mcv.length();
+        	double absmcv = Double.isNaN(mcv.length()) ? 0 : mcv.length();
+        	//PsDebug.message(i+": "+absmcv);
+        	meanCurvature[i] = absmcv;
 		}
 
-		return calculateStatistics(meanCurvature);
+		PsDebug.message("Coloring object...");
+		makeElementColors(meanCurvature);
+		PsDebug.message("Done!");
+
+		return meanCurvature;
 	}
 
-	//iterative averaging
-	public void surfaceSmoothIter(int iters) {
-		//PiVector[] neighbours = m_geom.getNeighbours();
-		System.out.println("num vertices: " + m_geomSave.getNumVertices());
-		System.out.println("num elements: " + m_geomSave.getNumElements());
-
-		int maxValence = (int)calculateStatistics(calculateValence())[2];
-		int[][] neighbours = new int[m_geomSave.getNumVertices()][maxValence];
-		int[] sizes = new int[m_geomSave.getNumVertices()];
+	private NeighboursSizesPair createNeighbours() {
+		int maxValence = (int) calculateStatistics(calculateValence())[2];
+		int[][] neighbours = new int[m_geom.getNumVertices()][maxValence];
+		int[] sizes = new int[m_geom.getNumVertices()];
 		for(int i = 0; i< sizes.length; i++){
 			sizes[i] = 0;
 		}
 
-		for(int i=0; i< m_geomSave.getNumEdgeStars(); i++){
-			PgEdgeStar edgeStar = m_geomSave.getEdgeStar(i);
+		for(int i=0; i< m_geom.getNumEdgeStars(); i++){
+			PgEdgeStar edgeStar = m_geom.getEdgeStar(i);
 			int point1 = edgeStar.getVertexInd(0);
 			int point2 = edgeStar.getVertexInd(1);
 			int sizePoint1 = sizes[point1];
@@ -316,6 +313,19 @@ public class MyWorkshop extends PjWorkshop {
 			sizes[point1]++;
 			sizes[point2]++;
 		}
+
+		return new NeighboursSizesPair(neighbours, sizes);
+	}
+
+	//iterative averaging
+	public void surfaceSmoothIter(int iters) {
+		//PiVector[] neighbours = m_geom.getNeighbours();
+		System.out.println("num vertices: " + m_geomSave.getNumVertices());
+		System.out.println("num elements: " + m_geomSave.getNumElements());
+
+		NeighboursSizesPair nsp = createNeighbours();
+		int[][] neighbours = nsp.neighbours;
+		int[] sizes = nsp.sizes;
 
 		for (int iter = 0; iter < iters; iter++) {
 
@@ -345,5 +355,15 @@ public class MyWorkshop extends PjWorkshop {
 
 	void meanCurvaturSmooth(int iters){
 
+	}
+
+	public class NeighboursSizesPair {
+	    public final int[][] neighbours;
+	    public final int[] sizes;
+
+	    public NeighboursSizesPair(int[][] neighbours, int[] sizes) {
+	        this.sizes = sizes;
+	        this.neighbours = neighbours;
+	    }
 	}
 }
