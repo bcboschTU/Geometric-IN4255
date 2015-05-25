@@ -262,29 +262,35 @@ public class MyWorkshop extends PjWorkshop {
 
 		double[] meanCurvature = new double[neighbours.length];
 
+		// For each vertex that has neighbours..
         for(int i = 0; i < neighbours.length; i++){
         	PdVector vertex = m_geom.getVertex(i);
         	PdVector mcv = new PdVector();
 
         	//PsDebug.message("Vector "+i+": "+angles[i].length+" angles");
+        	//If at least a triangle
         	if(angles[i].length < 3) {
         		continue;
         	}
 
+        	// For each neighbour of the vertex
         	for(int j = 0; j < sizes[i]; j++) {
-        		int vertIndex = neighbours[i][j];
-        		PdVector neighbour = m_geom.getVertex(vertIndex);
+        		PdVector neighbour = m_geom.getVertex(neighbours[i][j]);
         		
+        		//First create the sum vector
         		//Slide 39, lecture 3, sum((cotaij + cotbij) * (xi - xj))
         		PdVector ximinusxj = PdVector.subNew(vertex, neighbour);
         		ximinusxj.multScalar(((1/Math.tan(angles[i][1])) + (1/Math.tan(angles[i][2]))));
         		mcv.add(ximinusxj);
         	}
+        	//Now scale to the area of the vertex and its neighbours
         	//Slide 39, lecture 3, 3/2area(star(xi))???
         	mcv.multScalar(3 / 2);
+
+        	//Save the absolute value of the mean curvature vector
         	double absmcv = Double.isNaN(mcv.length()) ? 0 : mcv.length();
-        	//PsDebug.message(i+": "+absmcv);
         	meanCurvature[i] = absmcv;
+        	//PsDebug.message(i+": "+absmcv);
 		}
 
 		PsDebug.message("Coloring object...");
@@ -294,6 +300,7 @@ public class MyWorkshop extends PjWorkshop {
 		return meanCurvature;
 	}
 
+	//Create neighbours array, works better than standard getNeighbours().
 	private NeighboursSizesPair createNeighbours() {
 		int maxValence = (int) calculateStatistics(calculateValence())[2];
 		int[][] neighbours = new int[m_geom.getNumVertices()][maxValence];
@@ -357,6 +364,7 @@ public class MyWorkshop extends PjWorkshop {
 
 	}
 
+	// Helper class to combine return values
 	public class NeighboursSizesPair {
 	    public final int[][] neighbours;
 	    public final int[] sizes;
