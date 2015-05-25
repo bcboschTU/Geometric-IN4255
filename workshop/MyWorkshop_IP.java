@@ -82,7 +82,7 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 		super.setParent(parent);
 		m_ws = (MyWorkshop)parent;
 	
-		addSubTitle("Example functions:");
+		/*addSubTitle("Example functions:");
 		
 		m_bMakeRandomElementColors = new Button("Random Element Colors");
 		m_bMakeRandomElementColors.addActionListener(this);
@@ -97,13 +97,13 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 		m_xOff.setDefBounds(-10, 10, 0.1, 1);
 		m_xOff.addUpdateListener(this);
 		m_xOff.init();
-		add(m_xOff.getInfoPanel());
+		add(m_xOff.getInfoPanel());*/
 		
 		addSubTitle("Task 1 - Shape statistics:");
 		
-		m_bShapeRegularty = new Button("shape regularity");
+		m_bShapeRegularty = new Button("Shape regularity");
 		m_bShapeRegularty.addActionListener(this);
-		m_bValence = new Button(" valence");
+		m_bValence = new Button("Valence");
 		m_bValence.addActionListener(this);
 		m_bAngles = new Button("Angles");
 		m_bAngles.addActionListener(this);
