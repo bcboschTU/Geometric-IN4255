@@ -2,8 +2,10 @@ package workshop;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.Arrays;
+import java.util.Collections;
 import java.lang.Math;
 
 import jv.geom.PgElementSet;
@@ -283,48 +285,67 @@ public class MyWorkshop extends PjWorkshop {
 		NeighboursSizesPair nsp = createNeighbours();
 		int[][] neighbours = nsp.neighbours;
 		int[] sizes = nsp.sizes;
-		double[][] angles = calculateAngles();
 
 		double[] meanCurvature = new double[neighbours.length];
-
 		// For each vertex that has neighbours..
         for(int i = 0; i < neighbours.length; i++){
         	PdVector vertex = m_geom.getVertex(i);
         	PdVector mcv = new PdVector();
 
-        	//PsDebug.message("Vector "+i+": "+angles[i].length+" angles");
-        	//If at least a triangle
-        	if(angles[i].length < 3) {
-        		continue;
-        	}
-
         	double area = 0;
+        	int numTriangles = 0;
         	PdVector previous = null;        	
         	PdVector neighbour = null;
         	// For each neighbour of the vertex
         	for(int j = 0; j < sizes[i]; j++) {
+        		// Calculate AREA
         		if (previous != null) {
         			double sideA = calculateDistance(vertex, previous);
         			double sideB = calculateDistance(vertex, neighbour);
         			double sideC = calculateDistance(neighbour, previous);
         			double s = 0.5 * (sideA + sideB + sideC);
         			area += Math.sqrt(s*(s-sideA)*(s-sideB)*(s-sideC));
+        			numTriangles++;
         		}
         		if (neighbour != null) {
         			previous = neighbour;
         		}
         		neighbour = m_geom.getVertex(neighbours[i][j]);
 
-        		
-        		//First create the sum vector
-        		//Slide 39, lecture 3, sum((cotaij + cotbij) * (xi - xj))
-        		PdVector ximinusxj = PdVector.subNew(vertex, neighbour);
-        		ximinusxj.multScalar(((1/Math.tan(angles[i][1])) + (1/Math.tan(angles[i][2]))));
-        		mcv.add(ximinusxj);
+        		// Create list of common neighbours
+        		List<Integer> commonNeighbours = createIntList(neighbours[i]);
+        		List<Integer> nbNeighbours = createIntList(neighbours[neighbours[i][j]]);
+        		commonNeighbours.retainAll(nbNeighbours);
+        		commonNeighbours.removeAll(Collections.singleton(0));
+
+        		// Calculate ANGLES
+				ArrayList<Double> angles = new ArrayList<Double>();
+        		for(int k = 0; k < commonNeighbours.size(); k++) {
+	        		PdVector third = m_geom.getVertex(commonNeighbours.get(k).intValue());
+        			//http://math.stackexchange.com/questions/361412/finding-the-angle-between-three-points
+        			PdVector ab = PdVector.subNew(third, vertex);
+        			PdVector bc = PdVector.subNew(neighbour, third);
+        			double dot = PdVector.dot(ab, bc);
+        			double angle = Math.acos(dot / (ab.length() * bc.length())); //in rad
+        			if(angle >= 0) {
+        				angles.add(angle);
+        				//PsDebug.message("neighbour: "+neighbours[i][j]+" third: "+commonNeighbours.get(k).intValue()+" angle: "+angle);
+        			}
+        		}
+
+	        	//If vertex and neighbour have 2 common neighbours
+	        	//PsDebug.message("Vector "+i+": "+angles.size()+" angles");
+	        	if(angles.size() == 2) {
+	        		//First create the sum vector
+	        		//Slide 39, lecture 3, sum((cotaij + cotbij) * (xi - xj))
+	        		PdVector ximinusxj = PdVector.subNew(vertex, neighbour);
+	        		ximinusxj.multScalar(((1/Math.tan(angles.get(0))) + (1/Math.tan(angles.get(1)))));
+	        		mcv.add(ximinusxj);
+	        	}
         	}
         	//Now scale to the area of the vertex and its neighbours
         	//Slide 39, lecture 3, 3/2area(star(xi))
-        	//PsDebug.message(area+"");
+        	//PsDebug.message("Area based on "+numTriangles+" triangles: "+area);
         	mcv.multScalar(3 / (2*area));
 
         	//Save the absolute value of the mean curvature vector
@@ -333,11 +354,20 @@ public class MyWorkshop extends PjWorkshop {
         	//PsDebug.message(i+": "+absmcv);
 		}
 
-		PsDebug.message("Coloring object...");
+		//PsDebug.message("Coloring object...");
 		makeVertexColors(meanCurvature);
-		PsDebug.message("Done!");
+		//PsDebug.message("Done!");
 
 		return meanCurvature;
+	}
+
+	private List<Integer> createIntList(int[] array) {
+		List<Integer> list = new ArrayList<Integer>();
+	    for (int index = 0; index < array.length; index++)
+	    {
+	        list.add(array[index]);
+	    }
+	    return list;
 	}
 
 	//Create neighbours array, works better than standard getNeighbours().
@@ -360,6 +390,14 @@ public class MyWorkshop extends PjWorkshop {
 			sizes[point1]++;
 			sizes[point2]++;
 		}
+
+		/*for(int i=0;i<neighbours.length;i++) {
+			String msg = "Vertex["+i+"]:";
+			for(int j=0;j<sizes[i];j++) {
+				msg += " "+neighbours[i][j];
+			}
+			PsDebug.message(msg);
+		}*/
 
 		return new NeighboursSizesPair(neighbours, sizes);
 	}
