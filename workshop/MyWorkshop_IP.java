@@ -58,12 +58,17 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 
 	//Task3
 	protected Button m_bItterSmooth;
+	protected Label smoothing_iteration_label_iterative;
+	protected TextField smoothing_iteration_iterative;
+	protected Label smoothing_parameter_label_iterative;
+	protected TextField smoothing_parameter_iterative;
 	protected int numIter = 20;
 	protected Button m_bMeanCurvatureSmooth;
-	protected Label smoothing_iteration_label;
-	protected TextField smoothing_iteration;
-	protected Label smoothing_parameter_label;
-	protected TextField smoothing_parameter;
+	protected Label smoothing_iteration_label_curvature;
+	protected TextField smoothing_iteration_curvature;
+	protected Label smoothing_parameter_label_curvature;
+	protected TextField smoothing_parameter_curvature;
+
 	
 	MyWorkshop m_ws;
 	
@@ -212,14 +217,14 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 		add(panel5);
 
 		Panel panel6 = new Panel(new GridBagLayout());
-		smoothing_parameter_label = new Label("Smoothing parameter:");
-		smoothing_parameter = new TextField("0");
-		smoothing_iteration_label = new Label("Amount of smoothing iterations:");
-		smoothing_iteration = new TextField("0");
-		panel6.add(smoothing_iteration_label, left);
-		panel6.add(smoothing_iteration, right);
-		panel6.add(smoothing_parameter_label, left);
-		panel6.add(smoothing_parameter, right);
+		smoothing_parameter_label_iterative = new Label("Smoothing parameter:");
+		smoothing_parameter_iterative = new TextField("0");
+		smoothing_iteration_label_iterative = new Label("Amount of smoothing iterations:");
+		smoothing_iteration_iterative = new TextField("0");
+		panel6.add(smoothing_iteration_label_iterative, left);
+		panel6.add(smoothing_iteration_iterative, right);
+		panel6.add(smoothing_parameter_label_iterative, left);
+		panel6.add(smoothing_parameter_iterative, right);
 		add(panel6);
 
 		Panel panel7 = new Panel(new FlowLayout(FlowLayout.LEFT));
@@ -227,6 +232,13 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 		m_bMeanCurvatureSmooth.addActionListener(this);
 		panel7.add(m_bMeanCurvatureSmooth);
 		add(panel7);
+
+		Panel panel8 = new Panel(new GridBagLayout());
+		smoothing_parameter_label_curvature = new Label("Smoothing parameter:");
+		smoothing_parameter_curvature = new TextField("0");
+		smoothing_iteration_label_curvature = new Label("Amount of smoothing iterations:");
+		smoothing_iteration_curvature = new TextField("0");
+		add(panel8);
 
 		validate();
 	}
@@ -289,8 +301,8 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 			return;
 		}
 		else if(source == m_bItterSmooth){
-			String s1 = smoothing_iteration.getText();
-			String s2 = smoothing_parameter.getText();
+			String s1 = smoothing_iteration_iterative.getText();
+			String s2 = smoothing_parameter_iterative.getText();
 			m_ws.surfaceSmoothIter(Integer.parseInt(s1), Double.parseDouble(s2));
 			m_ws.m_geom.update(m_ws.m_geom);
 			return;

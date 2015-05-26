@@ -95,7 +95,7 @@ public class MyWorkshop extends PjWorkshop {
 
 		int noe = m_geom.getNumElements();
 		for(int i=0; i<noe; i++){
-			color = Color.getHSBColor(0.0f, 0.0gf, (float)normalizedValues[i]);
+			color = Color.getHSBColor(0.0f, 0.0f, (float)normalizedValues[i]);
 			m_geom.setElementColor(i, color);
 		}
 		m_geom.showElementColorFromVertices(false);
