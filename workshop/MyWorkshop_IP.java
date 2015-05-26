@@ -18,6 +18,7 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 
 	protected Button m_bMakeRandomElementColors;
 	protected Button m_bMakeRandomVertexColors;
+	protected Button m_bReset;
 
 	protected PuDouble m_xOff;
 
@@ -244,6 +245,13 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 		panel8.add(smoothing_parameter_curvature, right);
 		add(panel8);
 
+
+		Panel panel9 = new Panel(new FlowLayout(FlowLayout.LEFT));
+		m_bReset = new Button("Reset model");
+		m_bReset.addActionListener(this);
+		panel9.add(m_bReset);
+		add(panel9);
+
 		validate();
 	}
 	
@@ -315,6 +323,11 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 			String s1 = smoothing_iteration_curvature.getText();
 			String s2 = smoothing_parameter_curvature.getText();
 			m_ws.meanCurvaturSmooth(Integer.parseInt(s1), (float) Double.parseDouble(s2));
+			m_ws.m_geom.update(m_ws.m_geom);
+			return;
+		}
+		else if(source == m_bReset){
+			m_ws.reset();
 			m_ws.m_geom.update(m_ws.m_geom);
 			return;
 		}

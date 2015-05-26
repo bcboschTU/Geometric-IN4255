@@ -20,6 +20,7 @@ public class MyWorkshop extends PjWorkshop {
 
 	PgElementSet m_geom;
 	PgElementSet m_geomSave;
+	PgElementSet m_geomReset;
 	
 	public MyWorkshop() {
 		super("Geometric Modeling Practical 1");
@@ -31,12 +32,20 @@ public class MyWorkshop extends PjWorkshop {
 		super.setGeometry(geom);
 		m_geom 		= (PgElementSet)super.m_geom;
 		m_geomSave 	= (PgElementSet)super.m_geomSave;
+		m_geomReset	= (PgElementSet) geom.clone();
 		m_geom.allocateEdgeStars();
 		m_geomSave.allocateEdgeStars();
 	}
 	
 	public void init() {		
 		super.init();
+	}
+
+	public void reset() {
+		for(int i = 0; i<m_geomReset.getNumVertices();i++) {
+			m_geom.setVertex(i, m_geomReset.getVertex(i));
+		}
+		m_geomSave = m_geom;
 	}
 	
 	public void makeRandomElementColors() {
@@ -123,7 +132,7 @@ public class MyWorkshop extends PjWorkshop {
 		
 		int nov = m_geom.getNumVertices();
 		for(int i=0; i<nov; i++){
-			color = Color.getHSBColor(0.0f, 0.5f, (float)normalizedValues[i]);
+			color = Color.getHSBColor(0.0f, 0.0f, (float)normalizedValues[i]);
 			m_geom.setVertexColor(i, color);
 		}
 		
