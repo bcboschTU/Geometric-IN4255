@@ -296,7 +296,9 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 			return;
 		}
 		else if(source == m_bMeanCurvatureSmooth){
-			m_ws.meanCurvaturSmooth(numIter);
+			m_ws.meanCurvaturSmooth(1, -0.05f);
+			m_ws.m_geom.update(m_ws.m_geom);
+			return;
 		}
 	}
 	
