@@ -85,7 +85,7 @@ public class MyWorkshop extends PjWorkshop {
 		double[] normalizedValues = new double[entries.length];
 
 		for(int i=0;i<entries.length;i++) {
-			normalizedValues[i] = (Math.log10(entries[i]) - min) / (max-min);
+			normalizedValues[i] = ((entries[i]) - min) / (max-min);
 		}
 
 		//assure that the color array is allocated
@@ -95,7 +95,7 @@ public class MyWorkshop extends PjWorkshop {
 
 		int noe = m_geom.getNumElements();
 		for(int i=0; i<noe; i++){
-			color = Color.getHSBColor((float)normalizedValues[i], 1.0f, 1.0f);
+			color = Color.getHSBColor(0.0f, 0.0gf, (float)normalizedValues[i]);
 			m_geom.setElementColor(i, color);
 		}
 		m_geom.showElementColorFromVertices(false);
@@ -123,7 +123,7 @@ public class MyWorkshop extends PjWorkshop {
 		
 		int nov = m_geom.getNumVertices();
 		for(int i=0; i<nov; i++){
-			color = Color.getHSBColor((float)normalizedValues[i], 1.0f, 1.0f);
+			color = Color.getHSBColor(0.0f, 0.5f, (float)normalizedValues[i]);
 			m_geom.setVertexColor(i, color);
 		}
 		
