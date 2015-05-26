@@ -218,9 +218,9 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 
 		Panel panel6 = new Panel(new GridBagLayout());
 		smoothing_parameter_label_iterative = new Label("Smoothing parameter iterative:");
-		smoothing_parameter_iterative = new TextField("0");
+		smoothing_parameter_iterative = new TextField("0.2");
 		smoothing_iteration_label_iterative = new Label("Amount of smoothing iterations iterative:");
-		smoothing_iteration_iterative = new TextField("0");
+		smoothing_iteration_iterative = new TextField("20");
 		panel6.add(smoothing_iteration_label_iterative, left);
 		panel6.add(smoothing_iteration_iterative, right);
 		panel6.add(smoothing_parameter_label_iterative, left);
@@ -235,9 +235,9 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 
 		Panel panel8 = new Panel(new GridBagLayout());
 		smoothing_parameter_label_curvature = new Label("Smoothing parameter curvature:");
-		smoothing_parameter_curvature = new TextField("0");
+		smoothing_parameter_curvature = new TextField("0.0001");
 		smoothing_iteration_label_curvature = new Label("Amount of smoothing iterations curvature:");
-		smoothing_iteration_curvature = new TextField("0");
+		smoothing_iteration_curvature = new TextField("10");
 		panel8.add(smoothing_iteration_label_curvature, left);
 		panel8.add(smoothing_iteration_curvature, right);
 		panel8.add(smoothing_parameter_label_curvature, left);
@@ -314,7 +314,7 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 		else if(source == m_bMeanCurvatureSmooth){
 			String s1 = smoothing_iteration_curvature.getText();
 			String s2 = smoothing_parameter_curvature.getText();
-			m_ws.meanCurvaturSmooth(Integer.parseInt(s1), Float.parseFloat(s2));
+			m_ws.meanCurvaturSmooth(Integer.parseInt(s1), (float) Double.parseDouble(s2));
 			m_ws.m_geom.update(m_ws.m_geom);
 			return;
 		}
