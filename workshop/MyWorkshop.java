@@ -385,9 +385,9 @@ public class MyWorkshop extends PjWorkshop {
 				PdVector meanCurVer = vectorsMeanCur[i];
 				double length = vectorLenghts[i];
 
-				double x = vertex1.getEntry(0) - scalar * (meanCurVer.getEntry(0));
-				double y = vertex1.getEntry(1) - scalar * (meanCurVer.getEntry(1));
-				double z = vertex1.getEntry(2) - scalar * (meanCurVer.getEntry(2));
+				double x = vertex1.getEntry(0) + scalar * (meanCurVer.getEntry(0));
+				double y = vertex1.getEntry(1) + scalar * (meanCurVer.getEntry(1));
+				double z = vertex1.getEntry(2) + scalar * (meanCurVer.getEntry(2));
 
 				PdVector ret = new PdVector(x, y, z);
 
