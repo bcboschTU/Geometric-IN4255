@@ -60,6 +60,10 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 	protected Button m_bItterSmooth;
 	protected int numIter = 20;
 	protected Button m_bMeanCurvatureSmooth;
+	protected Label smoothing_iteration_label;
+	protected TextField smoothing_iteration;
+	protected Label smoothing_parameter_label;
+	protected TextField smoothing_parameter;
 	
 	MyWorkshop m_ws;
 	
@@ -201,14 +205,28 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
         add(meanCurvatureStatistics);
 
 		addSubTitle("Task 3 - Surface Smoothing:");
-		Panel panel5 = new Panel(new GridBagLayout());
+		Panel panel5 = new Panel(new FlowLayout(FlowLayout.LEFT));
 		m_bItterSmooth = new Button("Smooth iterative");
 		m_bItterSmooth.addActionListener(this);
+		panel5.add(m_bItterSmooth);
+		add(panel5);
+
+		Panel panel6 = new Panel(new GridBagLayout());
+		smoothing_parameter_label = new Label("Smoothing parameter:");
+		smoothing_parameter = new TextField("0");
+		smoothing_iteration_label = new Label("Amount of smoothing iterations:");
+		smoothing_iteration = new TextField("0");
+		panel6.add(smoothing_iteration_label, left);
+		panel6.add(smoothing_iteration, right);
+		panel6.add(smoothing_parameter_label, left);
+		panel6.add(smoothing_parameter, right);
+		add(panel6);
+
+		Panel panel7 = new Panel(new FlowLayout(FlowLayout.LEFT));
 		m_bMeanCurvatureSmooth = new Button("Mean Curvature iterative");
 		m_bMeanCurvatureSmooth.addActionListener(this);
-		panel5.add(m_bItterSmooth);
-		panel5.add(m_bMeanCurvatureSmooth);
-		add(panel5);
+		panel7.add(m_bMeanCurvatureSmooth);
+		add(panel7);
 
 		validate();
 	}
@@ -271,7 +289,9 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 			return;
 		}
 		else if(source == m_bItterSmooth){
-			m_ws.surfaceSmoothIter(numIter);
+			String s1 = smoothing_iteration.getText();
+			String s2 = smoothing_parameter.getText();
+			m_ws.surfaceSmoothIter(Integer.parseInt(s1), Double.parseDouble(s2));
 			m_ws.m_geom.update(m_ws.m_geom);
 			return;
 		}

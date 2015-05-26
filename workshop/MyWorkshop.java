@@ -403,7 +403,7 @@ public class MyWorkshop extends PjWorkshop {
 	}
 
 	//iterative averaging
-	public void surfaceSmoothIter(int iters) {
+	public void surfaceSmoothIter(int iters, double scalar) {
 		//PiVector[] neighbours = m_geom.getNeighbours();
 		System.out.println("num vertices: " + m_geomSave.getNumVertices());
 		System.out.println("num elements: " + m_geomSave.getNumElements());
@@ -424,7 +424,6 @@ public class MyWorkshop extends PjWorkshop {
 					temp.add(neighbour);
 				}
 
-				double scalar = 0.2;
 				double x = vertex1.getEntry(0) + scalar*((temp.getEntry(0) / sizes[i]) - vertex1.getEntry(0));
 				double y = vertex1.getEntry(1) + scalar*((temp.getEntry(1) / sizes[i]) - vertex1.getEntry(1));
 				double z = vertex1.getEntry(2) + scalar*((temp.getEntry(2) / sizes[i]) - vertex1.getEntry(2));
