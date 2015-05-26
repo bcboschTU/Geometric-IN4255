@@ -217,9 +217,9 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 		add(panel5);
 
 		Panel panel6 = new Panel(new GridBagLayout());
-		smoothing_parameter_label_iterative = new Label("Smoothing parameter:");
+		smoothing_parameter_label_iterative = new Label("Smoothing parameter iterative:");
 		smoothing_parameter_iterative = new TextField("0");
-		smoothing_iteration_label_iterative = new Label("Amount of smoothing iterations:");
+		smoothing_iteration_label_iterative = new Label("Amount of smoothing iterations iterative:");
 		smoothing_iteration_iterative = new TextField("0");
 		panel6.add(smoothing_iteration_label_iterative, left);
 		panel6.add(smoothing_iteration_iterative, right);
@@ -234,10 +234,14 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 		add(panel7);
 
 		Panel panel8 = new Panel(new GridBagLayout());
-		smoothing_parameter_label_curvature = new Label("Smoothing parameter:");
+		smoothing_parameter_label_curvature = new Label("Smoothing parameter curvature:");
 		smoothing_parameter_curvature = new TextField("0");
-		smoothing_iteration_label_curvature = new Label("Amount of smoothing iterations:");
+		smoothing_iteration_label_curvature = new Label("Amount of smoothing iterations curvature:");
 		smoothing_iteration_curvature = new TextField("0");
+		panel8.add(smoothing_iteration_label_curvature, left);
+		panel8.add(smoothing_iteration_curvature, right);
+		panel8.add(smoothing_parameter_label_curvature, left);
+		panel8.add(smoothing_parameter_curvature, right);
 		add(panel8);
 
 		validate();
@@ -308,7 +312,9 @@ public class MyWorkshop_IP extends PjWorkshop_IP implements ActionListener {
 			return;
 		}
 		else if(source == m_bMeanCurvatureSmooth){
-			m_ws.meanCurvaturSmooth(1, 0.05f);
+			String s1 = smoothing_iteration_curvature.getText();
+			String s2 = smoothing_parameter_curvature.getText();
+			m_ws.meanCurvaturSmooth(Integer.parseInt(s1), Float.parseFloat(s2));
 			m_ws.m_geom.update(m_ws.m_geom);
 			return;
 		}
