@@ -390,12 +390,10 @@ public class MyWorkshop extends PjWorkshop {
 			double[] vectorLenghts = calculateMeanCurvature();
 			double max = 0;
 
-			System.out.println("test0");
 			for (int i = 0; i < vectorLenghts.length; i++) {
 				if (vectorLenghts[i] > max)
 					max = vectorLenghts[i];
 			}
-			System.out.println("test1");
 			for (int i = 0; i < vectorLenghts.length; i++) {
 				vectorLenghts[i] = vectorLenghts[i] / max;
 			}
