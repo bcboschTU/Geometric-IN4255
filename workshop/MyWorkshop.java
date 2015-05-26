@@ -253,14 +253,14 @@ public class MyWorkshop extends PjWorkshop {
 
 		for(int i=0; i< m_geom.getNumEdgeStars(); i++){
 			PgEdgeStar edgeStar = m_geom.getEdgeStar(i);
-			lengths[i] = calculateDistance(m_geom.getVertex(edgeStar.getVertexInd(0)),m_geom.getVertex(edgeStar.getVertexInd(1)));
+			lengths[i] = calculateDistance(m_geom.getVertex(edgeStar.getVertexInd(0)), m_geom.getVertex(edgeStar.getVertexInd(1)));
 		}
 		return lengths;
 	}
 
 	public double calculateDistance(PdVector point1,PdVector point2){
 		double x = Math.pow(point1.getEntry(0) - point2.getEntry(0), 2);
-		double y = Math.pow(point1.getEntry(1) - point2.getEntry(1),2);
+		double y = Math.pow(point1.getEntry(1) - point2.getEntry(1), 2);
 		double z = Math.pow(point1.getEntry(2) - point2.getEntry(2),2);
 		return Math.sqrt(x + y + z);
 	}
@@ -439,7 +439,84 @@ public class MyWorkshop extends PjWorkshop {
 	}
 
 	void meanCurvaturSmooth(int iters){
+		PdVector[] vectorsMeanCur =  calculateMeanCurvatureVectors();
 
+		for(int iter = 0; iter< iters; iter++){
+
+		}
+	}
+
+	public PdVector[] calculateMeanCurvatureVectors(){
+		NeighboursSizesPair nsp = createNeighbours();
+		int[][] neighbours = nsp.neighbours;
+		int[] sizes = nsp.sizes;
+		PdVector[] meanCurvature = new PdVector[neighbours.length];
+		// For each vertex that has neighbours..
+		for(int i = 0; i < neighbours.length; i++){
+			PdVector vertex = m_geom.getVertex(i);
+			PdVector mcv = new PdVector();
+
+			double area = 0;
+			int numTriangles = 0;
+			PdVector previous = null;
+			PdVector neighbour = null;
+			// For each neighbour of the vertex
+			for(int j = 0; j < sizes[i]; j++) {
+				// Calculate AREA
+				if (previous != null) {
+					double sideA = calculateDistance(vertex, previous);
+					double sideB = calculateDistance(vertex, neighbour);
+					double sideC = calculateDistance(neighbour, previous);
+					double s = 0.5 * (sideA + sideB + sideC);
+					area += Math.sqrt(s*(s-sideA)*(s-sideB)*(s-sideC));
+					numTriangles++;
+				}
+				if (neighbour != null) {
+					previous = neighbour;
+				}
+				neighbour = m_geom.getVertex(neighbours[i][j]);
+
+				// Create list of common neighbours
+				List<Integer> commonNeighbours = createIntList(neighbours[i]);
+				List<Integer> nbNeighbours = createIntList(neighbours[neighbours[i][j]]);
+				commonNeighbours.retainAll(nbNeighbours);
+				commonNeighbours.removeAll(Collections.singleton(0));
+
+				// Calculate ANGLES
+				ArrayList<Double> angles = new ArrayList<Double>();
+				for(int k = 0; k < commonNeighbours.size(); k++) {
+					PdVector third = m_geom.getVertex(commonNeighbours.get(k).intValue());
+					//http://math.stackexchange.com/questions/361412/finding-the-angle-between-three-points
+					PdVector ab = PdVector.subNew(third, vertex);
+					PdVector bc = PdVector.subNew(neighbour, third);
+					double dot = PdVector.dot(ab, bc);
+					double angle = Math.acos(dot / (ab.length() * bc.length())); //in rad
+					if(angle >= 0) {
+						angles.add(angle);
+						//PsDebug.message("neighbour: "+neighbours[i][j]+" third: "+commonNeighbours.get(k).intValue()+" angle: "+angle);
+					}
+				}
+
+				//If vertex and neighbour have 2 common neighbours
+				//PsDebug.message("Vector "+i+": "+angles.size()+" angles");
+				if(angles.size() == 2) {
+					//First create the sum vector
+					//Slide 39, lecture 3, sum((cotaij + cotbij) * (xi - xj))
+					PdVector ximinusxj = PdVector.subNew(vertex, neighbour);
+					ximinusxj.multScalar(((1/Math.tan(angles.get(0))) + (1/Math.tan(angles.get(1)))));
+					mcv.add(ximinusxj);
+				}
+			}
+			//Now scale to the area of the vertex and its neighbours
+			//Slide 39, lecture 3, 3/2area(star(xi))
+			//PsDebug.message("Area based on "+numTriangles+" triangles: "+area);
+			mcv.multScalar(3 / (2*area));
+
+			//Save the absolute value of the mean curvature vector
+			meanCurvature[i] = mcv;
+			//PsDebug.message(i+": "+absmcv);
+		}
+		return meanCurvature;
 	}
 
 	// Helper class to combine return values
