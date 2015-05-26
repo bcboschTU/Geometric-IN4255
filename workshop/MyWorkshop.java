@@ -385,18 +385,27 @@ public class MyWorkshop extends PjWorkshop {
 	}
 
 	void meanCurvaturSmooth(int iters, float scalar){
-		PdVector[] vectorsMeanCur =  calculateMeanCurvatureVectors();
-		double [] vectorLenghts = calculateMeanCurvature();
-
 		for(int iter = 0; iter< iters; iter++){
+			PdVector[] vectorsMeanCur =  calculateMeanCurvatureVectors();
+			double [] vectorLenghts = calculateMeanCurvature();
+			double max = 0;
+			for(int i = 0; i< vectorLenghts.length;i++){
+				if(vectorLenghts[i] > max)
+					max = vectorLenghts[i];
+			}
+			for(int i = 0; i< vectorLenghts.length;i++){
+				vectorLenghts[i] = vectorLenghts[i]/max;
+			}
+
+
 			for (int i = 0; i < vectorLenghts.length; i++) {
 				PdVector vertex1 = m_geomSave.getVertex(i);
 				PdVector meanCurVer = vectorsMeanCur[i];
 				double length = vectorLenghts[i];
 
-				double x = vertex1.getEntry(0) + scalar * (meanCurVer.getEntry(0));
-				double y = vertex1.getEntry(1) + scalar * (meanCurVer.getEntry(1));
-				double z = vertex1.getEntry(2) + scalar * (meanCurVer.getEntry(2));
+				double x = vertex1.getEntry(0) + (scalar * length) * (meanCurVer.getEntry(0));
+				double y = vertex1.getEntry(1) + (scalar * length) * (meanCurVer.getEntry(1));
+				double z = vertex1.getEntry(2) + (scalar * length) * (meanCurVer.getEntry(2));
 
 				PdVector ret = new PdVector(x, y, z);
 
