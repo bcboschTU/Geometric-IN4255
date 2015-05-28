@@ -18,10 +18,7 @@ public class MyWorkshopAssignment2_IP extends PjWorkshop_IP implements ActionLis
 
 
 	// Task 1
-	protected Button m_bShapeRegularty;
-	protected Button m_bValence;
-	protected Button m_bAngles;
-	protected Button m_bLengthEdges;
+	protected Button m_bSparseMatrix;
 
 	protected Label m_mean;
     protected Label m_mean_label;
@@ -55,19 +52,10 @@ public class MyWorkshopAssignment2_IP extends PjWorkshop_IP implements ActionLis
 		
 		addSubTitle("Gradients of Linear Polynomial:");
 		
-		m_bShapeRegularty = new Button("Shape regularity");
-		m_bShapeRegularty.addActionListener(this);
-		m_bValence = new Button("Valence");
-		m_bValence.addActionListener(this);
-		m_bAngles = new Button("Angles");
-		m_bAngles.addActionListener(this);
-		m_bLengthEdges = new Button("Length");
-		m_bLengthEdges.addActionListener(this);
+		m_bSparseMatrix = new Button("Compute sparse matrix G");
+		m_bSparseMatrix.addActionListener(this);
 		Panel panel2 = new Panel(new FlowLayout(FlowLayout.LEFT));
-		panel2.add(m_bShapeRegularty);
-		panel2.add(m_bValence);
-		panel2.add(m_bAngles);
-		panel2.add(m_bLengthEdges);
+		panel2.add(m_bSparseMatrix);
 		add(panel2);
 
 		addSubTitle("Mesh editing");
@@ -96,23 +84,8 @@ public class MyWorkshopAssignment2_IP extends PjWorkshop_IP implements ActionLis
 	
 	public void actionPerformed(ActionEvent event) {
 		Object source = event.getSource();
-		if(source == m_bShapeRegularty){
-			updateValues(m_ws.calculateStatistics(m_ws.calculateShapeRegularity()));
-			m_ws.m_geom.update(m_ws.m_geom);
-			return;
-		}
-		else if(source == m_bValence){
-			updateValues(m_ws.calculateStatistics(m_ws.calculateValence()));
-			m_ws.m_geom.update(m_ws.m_geom);
-			return;
-		}
-		else if(source == m_bAngles){
-			updateValues(m_ws.calculateStatistics(m_ws.calculateAngles()));
-			m_ws.m_geom.update(m_ws.m_geom);
-			return;
-		}
-		else if(source == m_bLengthEdges){
-			updateValues(m_ws.calculateStatistics(m_ws.calculateLengthEdges()));
+		if(source == m_bSparseMatrix){
+			m_ws.CalculateSparseMatrix();
 			m_ws.m_geom.update(m_ws.m_geom);
 			return;
 		}
@@ -121,12 +94,5 @@ public class MyWorkshopAssignment2_IP extends PjWorkshop_IP implements ActionLis
 			m_ws.m_geom.update(m_ws.m_geom);
 			return;
 		}
-	}
-	
-	public void updateValues(double[] statistics){
-		m_mean.setText("" + new DecimalFormat("##.##").format(statistics[0]));
-		m_min.setText("" + new DecimalFormat("##.##").format(statistics[1]));
-		m_max.setText("" + new DecimalFormat("##.##").format(statistics[2]));
-		m_sd.setText("" + new DecimalFormat("##.##").format(statistics[3]));
 	}
 }
