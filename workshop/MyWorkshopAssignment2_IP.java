@@ -53,7 +53,7 @@ public class MyWorkshopAssignment2_IP extends PjWorkshop_IP implements ActionLis
 		super.setParent(parent);
 		m_ws = (MyWorkshopAssignment2)parent;
 		
-		addSubTitle("Task 1 - Shape statistics:");
+		addSubTitle("Gradients of Linear Polynomial:");
 		
 		m_bShapeRegularty = new Button("Shape regularity");
 		m_bShapeRegularty.addActionListener(this);
@@ -70,11 +70,16 @@ public class MyWorkshopAssignment2_IP extends PjWorkshop_IP implements ActionLis
 		panel2.add(m_bLengthEdges);
 		add(panel2);
 
-		Panel panel9 = new Panel(new FlowLayout(FlowLayout.LEFT));
+		addSubTitle("Mesh editing");
+		Panel panel3 = new Panel(new FlowLayout(FlowLayout.LEFT));
+		add(panel3);
+
+
+		Panel resetPanel = new Panel(new FlowLayout(FlowLayout.LEFT));
 		m_bReset = new Button("Reset model");
 		m_bReset.addActionListener(this);
-		panel9.add(m_bReset);
-		add(panel9);
+		resetPanel.add(m_bReset);
+		add(resetPanel);
 
 		validate();
 	}
