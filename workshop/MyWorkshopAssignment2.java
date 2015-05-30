@@ -11,8 +11,11 @@ import jv.geom.PgElementSet;
 import jv.project.PgGeometry;
 import jv.vecmath.PdVector;
 import jv.vecmath.PiVector;
+import jvx.numeric.PnSparseMatrix;
 import jv.geom.PgEdgeStar;
 import jvx.project.PjWorkshop;
+import jv.object.PsDebug;
+
 
 public class MyWorkshopAssignment2 extends PjWorkshop {
 
@@ -21,7 +24,7 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 	PgElementSet m_geomReset;
 	
 	public MyWorkshopAssignment2() {
-		super("Geometric Modeling Practical 1");
+		super("Geometric Modeling Practical 2");
 		init();
 	}
 	
@@ -58,5 +61,25 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 	}
 
 	public void CalculateSparseMatrix() {
+	}
+
+	public void editTriangleMesh(PnSparseMatrix a) {
+		/*For solving the sparse linear systems (Task 2), you can use
+		dev6.numeric.PnMumpsSolver. This class offers an interface to the direct
+		solvers of the MUMPS library. To solve the system Ax = b, you can use the
+		method solve(A, x, b, PnMumpsSolver.Type.GENERAL SYMMETRIC).
+		For solving a number of systems with the same matrix, compute the factorization once using:
+		- public static long factor(PnSparseMatrix matrix, Type sym)
+		and use
+		- public static native void solve(long factorization, PdVector x, PdVector b)
+		for solving the systems.
+		The MUMPS library should work on WINDOWS 64-bit systems. For MAC,
+		I added the file libMumpsJNI.jnilib to blackboard. Please copy the le to
+		the "dll"folder. This file may not work on your MAC, because it depends
+		on other libraries including gcc and gfortran.
+		If the MUMPS library does not work on your system, you can use
+		jvx.numeric.PnBiconjugateGradient instead. However, this is less efficient (do not use too large meshes in this case).*/
+
+		PsDebug.message(a.toString());
 	}
 }
