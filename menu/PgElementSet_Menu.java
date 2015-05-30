@@ -18,7 +18,7 @@ import workshop.MyWorkshopAssignment2;
 public class PgElementSet_Menu extends PgPointSet_Menu {
 	
 	private enum MenuEntry{
-		MyWorkshop			("MyWorkshop..."),
+		MyWorkshop			("Assignment 1"),
 		MyWorkshopAssignment2 ("Assignment 2")
 		// Additional entries...
 		;

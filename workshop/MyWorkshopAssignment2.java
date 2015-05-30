@@ -60,9 +60,78 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 		m_geomSave = m_geom;
 	}
 
-	public void CalculateSparseMatrix() {
+	/*
+	Implement a method that computes the sparse matrix G, which maps a continuous
+	 linear polynomial over all triangles of a mesh to its gradient vectors.
+	*/
+	public PnSparseMatrix calculateLinearPolynomialGradients() {
+		int n = 2 - m_geom.getNumVertices() + m_geom.getNumEdges();
+		int m = m_geom.getNumVertices();
+		PnSparseMatrix G = new PnSparseMatrix(n, m, 3);
+
+		// for each triangle
+		int[][] triangles = getTriangles();
+		for (int i = 0; i < triangles.length; i++) {
+			int[] triangle = triangles[i];
+			PsDebug.message(triangle[1] + " " + triangle[2] + " " + triangle[3]);
+			PdVector a = m_geom.getVertex(triangle[1]);
+			PdVector b = m_geom.getVertex(triangle[2]);
+			PdVector c = m_geom.getVertex(triangle[3]);
+			PnSparseMatrix triangleLP = mapTriangleToGradient(a, b, c);
+
+			// TODO do magic with this
+		}
+
+		return G;
+
+		/*You can use the method addEntry(int k, int l, double value) for
+		constructing the matrix. The method adds value at position k; l in the
+		matrix. If the matrix entry with k; l does not exist, the space for storing
+		it is created.
+
+		For multiplication of sparse matrices you can use:
+		AB = PnSparsematrix.multMatrices(A,B, null);
+
+		For multiplication of a sparse matrix and a vector you can use:
+		Av = PnSparsematrix.rightMultVector(A, v, null);. 
+		This method generates an new PdVector that is the product of the matrix and the vector. If a
+		PdVector w for storing the result is already allocated, use
+		PnSparsematrix:rightMultVector(A, v,w);. The method then additionally
+		returns a reference to w.*/
 	}
 
+	/*
+	As a first step, compute the 3x3 matrix that maps a linear polynomial
+	over a triangle to its gradient vector. Then use this method to compute the
+	matrix G for a triangle mesh.
+	*/
+	private PnSparseMatrix mapTriangleToGradient(PdVector a, PdVector b, PdVector c) {
+		PnSparseMatrix matrix = new PnSparseMatrix(3, 3, 3);
+
+		return matrix;
+	}
+
+	// Get a Nx3 array of vertex indices which form triangles.
+	private int[][] getTriangles() {
+		int[][] triangles = new int[2 - m_geom.getNumVertices() + m_geom.getNumEdges()][3];
+
+		// TODO create triangles somehow
+
+		return triangles;
+	}
+
+	/*
+	Implement a tool for editing triangle meshes (a simplified version of the
+	brushes tool we discussed in the lecture). It should allow to specify a 3x3
+	matrix A, which is applied to the gradient vectors of all selected triangles
+	of the mesh. Then, the vertex positions of the mesh are modified such that
+	the gradient vectors of the new mesh are as-close-as-possible (in the least-
+	squares sense) to the modified gradients.
+
+	Remark: The vertex positions is only determined up to translations of the
+	whole mesh in R^3. You can deal with this by keeping the barycenter of the
+	mesh constant.
+	*/
 	public void editTriangleMesh(PnSparseMatrix a) {
 		/*For solving the sparse linear systems (Task 2), you can use
 		dev6.numeric.PnMumpsSolver. This class offers an interface to the direct
