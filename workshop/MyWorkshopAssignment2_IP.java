@@ -3,7 +3,6 @@ package workshop;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.DecimalFormat;
 
 import jv.number.PuDouble;
 import jvx.numeric.PnSparseMatrix;
@@ -34,15 +33,6 @@ public class MyWorkshopAssignment2_IP extends PjWorkshop_IP implements ActionLis
 	protected TextField mesh_matrix_3_1;
 	protected TextField mesh_matrix_3_2;
 	protected TextField mesh_matrix_3_3;
-
-	protected Label m_mean;
-    protected Label m_mean_label;
-	protected Label m_min;
-    protected Label m_min_label;
-	protected Label m_max;
-    protected Label m_max_label;
-	protected Label m_sd;
-    protected Label m_sd_label;
 
 	MyWorkshopAssignment2 m_ws;
 	

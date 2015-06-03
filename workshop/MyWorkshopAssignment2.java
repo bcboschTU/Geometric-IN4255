@@ -1,18 +1,10 @@
 package workshop;
 
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Collections;
-import java.lang.Math;
-
 import jv.geom.PgElementSet;
 import jv.project.PgGeometry;
 import jv.vecmath.PdVector;
 import jv.vecmath.PiVector;
 import jvx.numeric.PnSparseMatrix;
-import jv.geom.PgEdgeStar;
 import jvx.project.PjWorkshop;
 import jv.object.PsDebug;
 
