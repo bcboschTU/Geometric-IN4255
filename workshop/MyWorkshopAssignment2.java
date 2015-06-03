@@ -9,18 +9,20 @@ import jvx.numeric.PnSparseMatrix;
 import jvx.project.PjWorkshop;
 import jv.object.PsDebug;
 
+import java.util.ArrayList;
+
 
 public class MyWorkshopAssignment2 extends PjWorkshop {
 
 	PgElementSet m_geom;
 	PgElementSet m_geomSave;
 	PgElementSet m_geomReset;
-	
+
 	public MyWorkshopAssignment2() {
 		super("Geometric Modeling Practical 2");
 		init();
 	}
-	
+
 	@Override
 	public void setGeometry(PgGeometry geom) {
 		super.setGeometry(geom);
@@ -30,8 +32,8 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 		m_geom.allocateEdgeStars();
 		m_geomSave.allocateEdgeStars();
 	}
-	
-	public void init() {		
+
+	public void init() {
 		super.init();
 	}
 
@@ -62,30 +64,66 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 	// re2 = R . e2
 	// re3 = R . e3
 	//G = Transpose[1/2area(T) * {re1, re2, re3} ]
-	private void calculateGradient(PiVector element) {
-		PdVector[] verticesOfElement = new PdVector[element.getSize()];
-		for (int i = 0; i < element.getSize(); i++) {
-			verticesOfElement[i] = m_geom.getVertex(element.getEntries()[i]);
-		}
-		double[][] test = new double[3][3];
+	private PnSparseMatrix calculateGradient(PiVector element) {
+		PnSparseMatrix R = new PnSparseMatrix(3, 3, 3);
 
-		PdMatrix R = new PdMatrix(test);
+		PdVector p1 = m_geom.getVertex(element.getEntry(0));
+		PdVector p2 = m_geom.getVertex(element.getEntry(1));
+		PdVector p3 = m_geom.getVertex(element.getEntry(2));
 
-		PdVector[] edges = new PdVector[3];
-		if (verticesOfElement.length == 3) {
-			edges[0] = PdVector.copyNew(verticesOfElement[2]);
-			edges[0].min(verticesOfElement[1]);
-			edges[1] = PdVector.copyNew(verticesOfElement[0]);
-			edges[1].min(verticesOfElement[2]);
-			edges[2] = PdVector.copyNew(verticesOfElement[1]);
-			edges[2].min(verticesOfElement[0]);
-		}
+		//http://math.stackexchange.com/questions/361412/finding-the-angle-between-three-points
+		PdVector e3 = PdVector.subNew(p2, p1);
+		PdVector e2 = PdVector.subNew(p1, p3);
+		PdVector e1 = PdVector.subNew(p3, p2);
+		double a1 = Math.acos(PdVector.dot(e3, e1) / (e3.length() * e1.length())); //in rad
+		double a2 = Math.acos(PdVector.dot(e2, e3) / (e2.length() * e3.length())); //in rad
+		double a3 = Math.acos(PdVector.dot(e1, e2) / (e1.length() * e2.length())); //in rad
+
 		// Convert vector to matrix
-		double[][] temp = new double[1][3];
-		temp[0] = edges[0].getEntries();
-		PdMatrix edgeMatrix0 = new PdMatrix(temp);
+		PdVector Re1 = PdVector.copyNew(e2);
+		Re1.multScalar(1 / Math.cos(a2));
+		PdVector temp1 = PdVector.copyNew(e3);
+		temp1.multScalar(1 / Math.cos(a3));
+		Re1.sub(temp1);
 
-		R.leftMult(edgeMatrix0);
+		PdVector Re2 = PdVector.copyNew(e3);
+		Re2.multScalar(1 / Math.cos(a3));
+		PdVector temp2 = PdVector.copyNew(e1);
+		temp2.multScalar(1 / Math.cos(a1));
+		Re2.sub(temp2);
+
+		PdVector Re3 = PdVector.copyNew(e1);
+		Re3.multScalar(1 / Math.cos(a1));
+		PdVector temp3 = PdVector.copyNew(e2);
+		temp3.multScalar(1 / Math.cos(a2));
+		Re3.sub(temp3);
+
+		double sideA = calculateDistance(p1, p2);
+		double sideB = calculateDistance(p2, p3);
+		double sideC = calculateDistance(p3, p1);
+		double s = 0.5 * (sideA + sideB + sideC);
+		double area = Math.sqrt(s*(s-sideA)*(s-sideB)*(s-sideC));
+
+		double f = 1/(2*area);
+
+		R.setEntry(0,0,f*Re1.getEntry(0));
+		R.setEntry(0,1,f*Re1.getEntry(1));
+		R.setEntry(0,2,f*Re1.getEntry(2));
+		R.setEntry(1,0,f*Re2.getEntry(0));
+		R.setEntry(1,1,f*Re2.getEntry(1));
+		R.setEntry(1,2,f*Re2.getEntry(2));
+		R.setEntry(2,0,f*Re3.getEntry(0));
+		R.setEntry(2,1,f*Re3.getEntry(1));
+		R.setEntry(2,2,f*Re3.getEntry(2));
+
+		return R;
+	}
+
+	private double calculateDistance(PdVector point1,PdVector point2){
+		double x = Math.pow(point1.getEntry(0) - point2.getEntry(0), 2);
+		double y = Math.pow(point1.getEntry(1) - point2.getEntry(1), 2);
+		double z = Math.pow(point1.getEntry(2) - point2.getEntry(2),2);
+		return Math.sqrt(x + y + z);
 	}
 
 	/*
@@ -100,7 +138,7 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 		PiVector [] elements = m_geom.getElements();
 		PiVector element = elements[0];
 
-		calculateGradient(element);
+		PsDebug.message(calculateGradient(element).toShortString());
 
 
 		/*You can use the method addEntry(int k, int l, double value) for
