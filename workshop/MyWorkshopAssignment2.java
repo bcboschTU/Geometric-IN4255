@@ -2,6 +2,7 @@ package workshop;
 
 import jv.geom.PgElementSet;
 import jv.project.PgGeometry;
+import jv.vecmath.PdMatrix;
 import jv.vecmath.PdVector;
 import jv.vecmath.PiVector;
 import jvx.numeric.PnSparseMatrix;
@@ -52,6 +53,41 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 		m_geomSave = m_geom;
 	}
 
+	// e1 = p3 - p2
+	// e2 = p1 - p3
+	// e3 = p2 - p1
+	// R =	( 0 , -1)
+	//		( 1 , 0 )
+	// re1 = R . e1
+	// re2 = R . e2
+	// re3 = R . e3
+	//G = Transpose[1/2area(T) * {re1, re2, re3} ]
+	private void calculateGradient(PiVector element) {
+		PdVector[] verticesOfElement = new PdVector[element.getSize()];
+		for (int i = 0; i < element.getSize(); i++) {
+			verticesOfElement[i] = m_geom.getVertex(element.getEntries()[i]);
+		}
+		double[][] test = new double[3][3];
+
+		PdMatrix R = new PdMatrix(test);
+
+		PdVector[] edges = new PdVector[3];
+		if (verticesOfElement.length == 3) {
+			edges[0] = PdVector.copyNew(verticesOfElement[2]);
+			edges[0].min(verticesOfElement[1]);
+			edges[1] = PdVector.copyNew(verticesOfElement[0]);
+			edges[1].min(verticesOfElement[2]);
+			edges[2] = PdVector.copyNew(verticesOfElement[1]);
+			edges[2].min(verticesOfElement[0]);
+		}
+		// Convert vector to matrix
+		double[][] temp = new double[1][3];
+		temp[0] = edges[0].getEntries();
+		PdMatrix edgeMatrix0 = new PdMatrix(temp);
+
+		R.leftMult(edgeMatrix0);
+	}
+
 	/*
 	Implement a method that computes the sparse matrix G, which maps a continuous
 	linear polynomial over all triangles of a mesh to its gradient vectors.
@@ -61,17 +97,10 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 		int m = m_geom.getNumVertices();
 		PnSparseMatrix G = new PnSparseMatrix(n, m, 3);
 
-		// for each triangle
-		for (int i = 0; i < m_geom.getNumElements(); i++) {
-			PiVector triangle = m_geom.getElement(i);
-			PsDebug.message(triangle.getEntry(1) + " " + triangle.getEntry(2) + " " + triangle.getEntry(3));
-			PdVector a = m_geom.getVertex(triangle.getEntry(1));
-			PdVector b = m_geom.getVertex(triangle.getEntry(2));
-			PdVector c = m_geom.getVertex(triangle.getEntry(3));
-			PnSparseMatrix triangleLP = mapTriangleToGradient(a, b, c);
+		PiVector [] elements = m_geom.getElements();
+		PiVector element = elements[0];
 
-			// TODO do magic with this
-		}
+		calculateGradient(element);
 
 
 		/*You can use the method addEntry(int k, int l, double value) for
