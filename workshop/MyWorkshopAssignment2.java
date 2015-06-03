@@ -31,6 +31,7 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 		m_geomReset	= (PgElementSet) geom.clone();
 		m_geom.allocateEdgeStars();
 		m_geomSave.allocateEdgeStars();
+		m_geom.makeElementNormals();
 	}
 
 	public void init() {
@@ -65,38 +66,17 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 	// re3 = R . e3
 	//G = Transpose[1/2area(T) * {re1, re2, re3} ]
 	private PdVector calculateGradient(PiVector element) {
+		PdVector normal = m_geom.getElementNormal(0);
+
 		PnSparseMatrix R = new PnSparseMatrix(3, 3, 3);
 
 		PdVector p1 = m_geom.getVertex(element.getEntry(0));
 		PdVector p2 = m_geom.getVertex(element.getEntry(1));
 		PdVector p3 = m_geom.getVertex(element.getEntry(2));
 
-		//http://math.stackexchange.com/questions/361412/finding-the-angle-between-three-points
-		PdVector e3 = PdVector.subNew(p2, p1);
-		PdVector e2 = PdVector.subNew(p1, p3);
 		PdVector e1 = PdVector.subNew(p3, p2);
-		double a1 = Math.acos(PdVector.dot(e3, e1) / (e3.length() * e1.length())); //in rad
-		double a2 = Math.acos(PdVector.dot(e2, e3) / (e2.length() * e3.length())); //in rad
-		double a3 = Math.acos(PdVector.dot(e1, e2) / (e1.length() * e2.length())); //in rad
-
-		// Convert vector to matrix
-		PdVector Re1 = PdVector.copyNew(e2);
-		Re1.multScalar(1 / Math.tan(a2));
-		PdVector temp1 = PdVector.copyNew(e3);
-		temp1.multScalar(1 / Math.tan(a3));
-		Re1.sub(temp1);
-
-		PdVector Re2 = PdVector.copyNew(e3);
-		Re2.multScalar(1 / Math.tan(a3));
-		PdVector temp2 = PdVector.copyNew(e1);
-		temp2.multScalar(1 / Math.tan(a1));
-		Re2.sub(temp2);
-
-		PdVector Re3 = PdVector.copyNew(e1);
-		Re3.multScalar(1 / Math.tan(a1));
-		PdVector temp3 = PdVector.copyNew(e2);
-		temp3.multScalar(1 / Math.tan(a2));
-		Re3.sub(temp3);
+		PdVector e2 = PdVector.subNew(p1, p3);
+		PdVector e3 = PdVector.subNew(p2, p1);
 
 		double sideA = calculateDistance(p1, p2);
 		double sideB = calculateDistance(p2, p3);
@@ -104,31 +84,44 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 		double s = 0.5 * (sideA + sideB + sideC);
 		double area = Math.sqrt(s*(s-sideA)*(s-sideB)*(s-sideC));
 
-		double f = 1/(2*area);
 
-		R.setEntry(0,0,f*Re1.getEntry(0));
-		R.setEntry(0,1,f*Re1.getEntry(1));
-		R.setEntry(0,2,f*Re1.getEntry(2));
-		R.setEntry(1,0,f*Re2.getEntry(0));
-		R.setEntry(1,1,f*Re2.getEntry(1));
-		R.setEntry(1,2,f*Re2.getEntry(2));
-		R.setEntry(2,0,f*Re3.getEntry(0));
-		R.setEntry(2,1,f*Re3.getEntry(1));
-		R.setEntry(2,2,f*Re3.getEntry(2));
-		/*R.setEntry(0,0,f*Re1.getEntry(0));
-		R.setEntry(1,0,f*Re1.getEntry(1));
-		R.setEntry(2,0,f*Re1.getEntry(2));
-		R.setEntry(0,1,f*Re2.getEntry(0));
-		R.setEntry(1,1,f*Re2.getEntry(1));
-		R.setEntry(2,1,f*Re2.getEntry(2));
-		R.setEntry(0,2,f*Re3.getEntry(0));
-		R.setEntry(1,2,f*Re3.getEntry(1));
-		R.setEntry(2,2,f*Re3.getEntry(2));*/
+
+		double scalar = 1/(2*area);
+
+		PdVector e1n = PdVector.crossNew(normal, e1);
+		PdVector e2n = PdVector.crossNew(normal, e2);
+		PdVector e3n = PdVector.crossNew(normal, e3);
+
+
+
+
+		R.setEntry(0,0, scalar * e1n.getEntry(0));
+		R.setEntry(1,0, scalar * e1n.getEntry(1));
+		R.setEntry(2,0, scalar * e1n.getEntry(2));
+
+		R.setEntry(0,1, scalar * e2n.getEntry(0));
+		R.setEntry(1,1, scalar * e2n.getEntry(1));
+		R.setEntry(2,1, scalar * e2n.getEntry(2));
+
+		R.setEntry(0,2, scalar * e3n.getEntry(0));
+		R.setEntry(1,2, scalar * e3n.getEntry(1));
+		R.setEntry(2,2, scalar * e3n.getEntry(2));
+
 
 		PdVector function = new PdVector(3);
 		function.setEntry(0, m_geom.getVectorField(1).getVector(0).getEntry(0));
-		function.setEntry(1, m_geom.getVectorField(1).getVector(1).getEntry(0));
-		function.setEntry(2, m_geom.getVectorField(1).getVector(2).getEntry(0));
+		function.setEntry(1, m_geom.getVectorField(1).getVector(2).getEntry(0));
+		function.setEntry(2, m_geom.getVectorField(1).getVector(1).getEntry(0));
+
+		PsDebug.message(Double.toString(m_geom.getVectorField(1).getVector(0).getEntry(0)));
+
+		PsDebug.message( Double.toString(m_geom.getVectorField(1).getVector(1).getEntry(0)));
+
+		PsDebug.message( Double.toString(m_geom.getVectorField(1).getVector(2).getEntry(0)));
+
+
+
+		PsDebug.message(R.toString());
 
 		return PnSparseMatrix.rightMultVector(R, function, null);
 	}
