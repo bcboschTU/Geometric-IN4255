@@ -64,7 +64,7 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 	// re2 = R . e2
 	// re3 = R . e3
 	//G = Transpose[1/2area(T) * {re1, re2, re3} ]
-	private PnSparseMatrix calculateGradient(PiVector element) {
+	private PdVector calculateGradient(PiVector element) {
 		PnSparseMatrix R = new PnSparseMatrix(3, 3, 3);
 
 		PdVector p1 = m_geom.getVertex(element.getEntry(0));
@@ -81,21 +81,21 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 
 		// Convert vector to matrix
 		PdVector Re1 = PdVector.copyNew(e2);
-		Re1.multScalar(1 / Math.cos(a2));
+		Re1.multScalar(1 / Math.tan(a2));
 		PdVector temp1 = PdVector.copyNew(e3);
-		temp1.multScalar(1 / Math.cos(a3));
+		temp1.multScalar(1 / Math.tan(a3));
 		Re1.sub(temp1);
 
 		PdVector Re2 = PdVector.copyNew(e3);
-		Re2.multScalar(1 / Math.cos(a3));
+		Re2.multScalar(1 / Math.tan(a3));
 		PdVector temp2 = PdVector.copyNew(e1);
-		temp2.multScalar(1 / Math.cos(a1));
+		temp2.multScalar(1 / Math.tan(a1));
 		Re2.sub(temp2);
 
 		PdVector Re3 = PdVector.copyNew(e1);
-		Re3.multScalar(1 / Math.cos(a1));
+		Re3.multScalar(1 / Math.tan(a1));
 		PdVector temp3 = PdVector.copyNew(e2);
-		temp3.multScalar(1 / Math.cos(a2));
+		temp3.multScalar(1 / Math.tan(a2));
 		Re3.sub(temp3);
 
 		double sideA = calculateDistance(p1, p2);
@@ -115,8 +115,22 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 		R.setEntry(2,0,f*Re3.getEntry(0));
 		R.setEntry(2,1,f*Re3.getEntry(1));
 		R.setEntry(2,2,f*Re3.getEntry(2));
+		/*R.setEntry(0,0,f*Re1.getEntry(0));
+		R.setEntry(1,0,f*Re1.getEntry(1));
+		R.setEntry(2,0,f*Re1.getEntry(2));
+		R.setEntry(0,1,f*Re2.getEntry(0));
+		R.setEntry(1,1,f*Re2.getEntry(1));
+		R.setEntry(2,1,f*Re2.getEntry(2));
+		R.setEntry(0,2,f*Re3.getEntry(0));
+		R.setEntry(1,2,f*Re3.getEntry(1));
+		R.setEntry(2,2,f*Re3.getEntry(2));*/
 
-		return R;
+		PdVector function = new PdVector(3);
+		function.setEntry(0, m_geom.getVectorField(1).getVector(0).getEntry(0));
+		function.setEntry(1, m_geom.getVectorField(1).getVector(1).getEntry(0));
+		function.setEntry(2, m_geom.getVectorField(1).getVector(2).getEntry(0));
+
+		return PnSparseMatrix.rightMultVector(R, function, null);
 	}
 
 	private double calculateDistance(PdVector point1,PdVector point2){
@@ -138,7 +152,7 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 		PiVector [] elements = m_geom.getElements();
 		PiVector element = elements[0];
 
-		PsDebug.message(calculateGradient(element).toShortString());
+		PsDebug.message(calculateGradient(element).toString());
 
 
 		/*You can use the method addEntry(int k, int l, double value) for
