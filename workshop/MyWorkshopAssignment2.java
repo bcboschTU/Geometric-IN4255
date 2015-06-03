@@ -62,27 +62,25 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 
 	/*
 	Implement a method that computes the sparse matrix G, which maps a continuous
-	 linear polynomial over all triangles of a mesh to its gradient vectors.
-	*/
+	linear polynomial over all triangles of a mesh to its gradient vectors.
+			*/
 	public PnSparseMatrix calculateLinearPolynomialGradients() {
-		int n = 2 - m_geom.getNumVertices() + m_geom.getNumEdges();
+		int n = 3 * (2 - m_geom.getNumVertices() + m_geom.getNumEdges());
 		int m = m_geom.getNumVertices();
 		PnSparseMatrix G = new PnSparseMatrix(n, m, 3);
 
 		// for each triangle
-		int[][] triangles = getTriangles();
-		for (int i = 0; i < triangles.length; i++) {
-			int[] triangle = triangles[i];
-			PsDebug.message(triangle[1] + " " + triangle[2] + " " + triangle[3]);
-			PdVector a = m_geom.getVertex(triangle[1]);
-			PdVector b = m_geom.getVertex(triangle[2]);
-			PdVector c = m_geom.getVertex(triangle[3]);
+		for (int i = 0; i < m_geom.getNumElements(); i++) {
+			PiVector triangle = m_geom.getElement(i);
+			PsDebug.message(triangle.getEntry(1) + " " + triangle.getEntry(2) + " " + triangle.getEntry(3));
+			PdVector a = m_geom.getVertex(triangle.getEntry(1));
+			PdVector b = m_geom.getVertex(triangle.getEntry(2));
+			PdVector c = m_geom.getVertex(triangle.getEntry(3));
 			PnSparseMatrix triangleLP = mapTriangleToGradient(a, b, c);
 
 			// TODO do magic with this
 		}
 
-		return G;
 
 		/*You can use the method addEntry(int k, int l, double value) for
 		constructing the matrix. The method adds value at position k; l in the
@@ -93,11 +91,13 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 		AB = PnSparsematrix.multMatrices(A,B, null);
 
 		For multiplication of a sparse matrix and a vector you can use:
-		Av = PnSparsematrix.rightMultVector(A, v, null);. 
+		Av = PnSparsematrix.rightMultVector(A, v, null);.
 		This method generates an new PdVector that is the product of the matrix and the vector. If a
 		PdVector w for storing the result is already allocated, use
 		PnSparsematrix:rightMultVector(A, v,w);. The method then additionally
 		returns a reference to w.*/
+
+		return G;
 	}
 
 	/*
@@ -109,15 +109,6 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 		PnSparseMatrix matrix = new PnSparseMatrix(3, 3, 3);
 
 		return matrix;
-	}
-
-	// Get a Nx3 array of vertex indices which form triangles.
-	private int[][] getTriangles() {
-		int[][] triangles = new int[2 - m_geom.getNumVertices() + m_geom.getNumEdges()][3];
-
-		// TODO create triangles somehow
-
-		return triangles;
 	}
 
 	/*
