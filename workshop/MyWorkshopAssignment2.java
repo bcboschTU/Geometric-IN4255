@@ -108,6 +108,8 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 		R.setEntry(2,2, scalar * e3n.getEntry(2));
 
 
+
+		//wrong entries for now, check with new mesh
 		PdVector function = new PdVector(3);
 		function.setEntry(0, m_geom.getVectorField(1).getVector(0).getEntry(0));
 		function.setEntry(1, m_geom.getVectorField(1).getVector(2).getEntry(0));
