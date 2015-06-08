@@ -149,15 +149,11 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 			PnSparseMatrix gradient = calculateGradient(elements[i]);
 			PsDebug.message(gradient.toString());
 
-			G.addEntry((3 * i), elements[i].getEntry(0), gradient.getEntry(0, 0));
-			G.addEntry((3 * i) + 1, elements[i].getEntry(0), gradient.getEntry(1, 0));
-			G.addEntry((3 * i) + 2, elements[i].getEntry(0), gradient.getEntry(2, 0));
-			G.addEntry((3 * i), elements[i].getEntry(1), gradient.getEntry(0, 1));
-			G.addEntry((3 * i) + 1, elements[i].getEntry(1), gradient.getEntry(1, 1));
-			G.addEntry((3 * i) + 2, elements[i].getEntry(1), gradient.getEntry(2, 1));
-			G.addEntry((3 * i), elements[i].getEntry(2), gradient.getEntry(0, 2));
-			G.addEntry((3 * i) + 1, elements[i].getEntry(2), gradient.getEntry(1, 2));
-			G.addEntry((3 * i) + 2, elements[i].getEntry(2), gradient.getEntry(2, 2));
+			for(int j = 0; j< 3; j++) {
+				G.addEntry((3 * i) + j , elements[i].getEntry(0), gradient.getEntry(j, 0));
+				G.addEntry((3 * i) + j, elements[i].getEntry(1), gradient.getEntry(j, 1));
+				G.addEntry((3 * i) + j, elements[i].getEntry(2), gradient.getEntry(j, 2));
+			}
 			// Add calculated gradient to the sparse matrix G
 		}
 
