@@ -193,12 +193,14 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 		PiVector[] selectedElements = getSelectedElements();
 		PsDebug.message("Selected Elements: " + selectedElements.length);
 
-		// Calculate right side of equation G_tranposed * WeightMatrix * G * X_tilde = G_tranposed * WeightMatrix * g_tilde
+		// Calculate right side of equation G_tranposed * WeightMatrix * G * X_tilde = G_tranposed * WeightMatrix * g_tilde_x
 		PnSparseMatrix rightSideMatrix = PnSparseMatrix.multMatrices(G_transpose, M, null);
 
 		PnSparseMatrix leftSideMatrix = PnSparseMatrix.multMatrices(G_transpose, PnSparseMatrix.multMatrices(M, G, null), null);
 
-		PdVector g_tilde = new PdVector(m_geom.getNumElements()*3);
+		PdVector g_tilde_x = new PdVector(m_geom.getNumElements()*3);
+		PdVector g_tilde_y = new PdVector(m_geom.getNumElements()*3);
+		PdVector g_tilde_z = new PdVector(m_geom.getNumElements()*3);
 		PiVector[] elements = m_geom.getElements();
 		// Calculate x gradient:
 		// deformation matrix a moet vermenigvuldigen met x, y en z waarden en niet met alleen x waarden
@@ -215,18 +217,18 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 			// Apply matrix to x gradient
 			PnSparseMatrix.rightMultVector(a, temp, g_tilde_temp);
 			// Set transformed values into vector
-			g_tilde.setEntry(i*3, g_tilde_temp.getEntry(0));
-			g_tilde.setEntry(i*3+1, g_tilde_temp.getEntry(1));
-			g_tilde.setEntry(i*3+2, g_tilde_temp.getEntry(2));
+			g_tilde_x.setEntry(i * 3, g_tilde_temp.getEntry(0));
+			g_tilde_x.setEntry(i * 3 + 1, g_tilde_temp.getEntry(1));
+			g_tilde_x.setEntry(i * 3 + 2, g_tilde_temp.getEntry(2));
 		}
-		PsDebug.message("g_tilde ");
-		PsDebug.message(g_tilde.toString());
+		PsDebug.message("g_tilde_x ");
+		PsDebug.message(g_tilde_x.toString());
 
-		PdVector rightSideVector = PnSparseMatrix.rightMultVector(rightSideMatrix, g_tilde, null);
+		PdVector rightSideVector = PnSparseMatrix.rightMultVector(rightSideMatrix, g_tilde_x, null);
 		PdVector x_tilde = new PdVector(rightSideVector.getSize());
 
 		PnBiconjugateGradient solver = new PnBiconjugateGradient();
-		solver.solve(leftSideMatrix, x_tilde, g_tilde);
+		solver.solve(leftSideMatrix, x_tilde, g_tilde_x);
 
 		// Resulting X coordinates
 		PsDebug.message("Resulting X coordinates");
@@ -240,6 +242,7 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 
 
 
+/*
 
 		for (PiVector element : selectedElements) {
 			// Create gradient vectors from positions
@@ -284,6 +287,7 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 				p.setEntry(2, ztilde.getEntry(e));
 			}
 		}
+*/
 
 		/*For solving the sparse linear systems (Task 2), you can use
 		dev6.numeric.PnMumpsSolver. This class offers an interface to the direct
