@@ -150,12 +150,16 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 			PnSparseMatrix gradient = calculateGradient(elements[i]);
 			PsDebug.message(gradient.toString());
 
-			for(int j = 0; j< 3; j++) {
-				G.addEntry((3 * i) + j , elements[i].getEntry(0), gradient.getEntry(j, 0));
-				G.addEntry((3 * i) + j, elements[i].getEntry(1), gradient.getEntry(j, 1));
-				G.addEntry((3 * i) + j, elements[i].getEntry(2), gradient.getEntry(j, 2));
-			}
 			// Add calculated gradient to the sparse matrix G
+			G.addEntry((3 * i), elements[i].getEntry(0), gradient.getEntry(0, 0));
+			G.addEntry((3 * i) + 1, elements[i].getEntry(0), gradient.getEntry(1, 0));
+			G.addEntry((3 * i) + 2, elements[i].getEntry(0), gradient.getEntry(2, 0));
+			G.addEntry((3 * i), elements[i].getEntry(1), gradient.getEntry(0, 1));
+			G.addEntry((3 * i) + 1, elements[i].getEntry(1), gradient.getEntry(1, 1));
+			G.addEntry((3 * i) + 2, elements[i].getEntry(1), gradient.getEntry(2, 1));
+			G.addEntry((3 * i), elements[i].getEntry(2), gradient.getEntry(0, 2));
+			G.addEntry((3 * i) + 1, elements[i].getEntry(2), gradient.getEntry(1, 2));
+			G.addEntry((3 * i) + 2, elements[i].getEntry(2), gradient.getEntry(2, 2));
 		}
 
 		PsDebug.message("Sparse matrix G:");
@@ -197,7 +201,17 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 		G.transpose();
 
 		// Calculate weight matrix, diagonal matrix with area of each triangle on element index
-		//PnSparseMatrix M =
+		int n = 3 * m_geom.getNumElements();
+		int m = m_geom.getNumVertices();
+		PnSparseMatrix M = new PnSparseMatrix(n, m, 3);
+		for (int i = 0; i < m_geom.getNumElements() ; i++ ) {
+			M.setEntry((i * 3), (i * 3), m_geom.getAreaOfElement(i));
+			M.setEntry((i * 3) + 1, (i * 3) + 1, m_geom.getAreaOfElement(i));
+			M.setEntry((i * 3) + 2, (i * 3) + 2, m_geom.getAreaOfElement(i));
+		}
+
+		PsDebug.message("Weight matrix M:");
+		PsDebug.message(M.toString());
 
 		PiVector[] selectedElements = getSelectedElements();
 		PsDebug.message("Selected Elements: " + selectedElements.length);
