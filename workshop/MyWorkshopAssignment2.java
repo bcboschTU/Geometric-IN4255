@@ -87,16 +87,11 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 		double s = 0.5 * (sideA + sideB + sideC);
 		double area = Math.sqrt(s*(s-sideA)*(s-sideB)*(s-sideC));
 
-
-
 		double scalar = 1/(2*area);
 
 		PdVector e1n = PdVector.crossNew(normal, e1);
 		PdVector e2n = PdVector.crossNew(normal, e2);
 		PdVector e3n = PdVector.crossNew(normal, e3);
-
-
-
 
 		R.setEntry(0,0, scalar * e1n.getEntry(0));
 		R.setEntry(1,0, scalar * e1n.getEntry(1));
@@ -110,9 +105,6 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 		R.setEntry(1,2, scalar * e3n.getEntry(1));
 		R.setEntry(2,2, scalar * e3n.getEntry(2));
 
-
-
-
 		//TEST FOR CORRECT GRADIENT PER FACE, uncomment to see the result in debug
 		//screen. This is commented because it will slow down the making of Big G.
 		/*
@@ -121,10 +113,9 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 		function.setEntry(1, m_geom.getVectorField(0).getVector(1).getEntry(0));
 		function.setEntry(2, m_geom.getVectorField(0).getVector(2).getEntry(0));
 
-
 		PsDebug.message(Double.toString(m_geom.getVectorField(0).getVector(0).getEntry(0)));
-		PsDebug.message( Double.toString(m_geom.getVectorField(0).getVector(1).getEntry(0)));
-		PsDebug.message( Double.toString(m_geom.getVectorField(0).getVector(2).getEntry(0)));
+		PsDebug.message(Double.toString(m_geom.getVectorField(0).getVector(1).getEntry(0)));
+		PsDebug.message(Double.toString(m_geom.getVectorField(0).getVector(2).getEntry(0)));
 		PsDebug.message(R.toString());
 		PnSparseMatrix R2 = R;
 		PsDebug.message(PnSparseMatrix.rightMultVector(R2, function, null).toString());
@@ -136,14 +127,14 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 	private double calculateDistance(PdVector point1,PdVector point2){
 		double x = Math.pow(point1.getEntry(0) - point2.getEntry(0), 2);
 		double y = Math.pow(point1.getEntry(1) - point2.getEntry(1), 2);
-		double z = Math.pow(point1.getEntry(2) - point2.getEntry(2),2);
+		double z = Math.pow(point1.getEntry(2) - point2.getEntry(2), 2);
 		return Math.sqrt(x + y + z);
 	}
 
 	/*
 	Implement a method that computes the sparse matrix G, which maps a continuous
 	linear polynomial over all triangles of a mesh to its gradient vectors.
-			*/
+	*/
 	public PnSparseMatrix calculateLinearPolynomialGradients() {
 		int n = 3 * m_geom.getNumElements();
 		int m = m_geom.getNumVertices();
@@ -164,21 +155,6 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 
 		PsDebug.message("Sparse matrix G:");
 		PsDebug.message(G.toString());
-
-		/*You can use the method addEntry(int k, int l, double value) for
-		constructing the matrix. The method adds value at position k; l in the
-		matrix. If the matrix entry with k; l does not exist, the space for storing
-		it is created.
-
-		For multiplication of sparse matrices you can use:
-		AB = PnSparsematrix.multMatrices(A,B, null);
-
-		For multiplication of a sparse matrix and a vector you can use:
-		Av = PnSparsematrix.rightMultVector(A, v, null);.
-		This method generates an new PdVector that is the product of the matrix and the vector. If a
-		PdVector w for storing the result is already allocated, use
-		PnSparsematrix:rightMultVector(A, v,w);. The method then additionally
-		returns a reference to w.*/
 
 		return G;
 	}
