@@ -1,5 +1,6 @@
 package workshop;
 
+//import workshop.dev6.numeric.PnMumpsSolver;
 //import dev6.numeric.PnMumpsSolver;
 import jvx.numeric.PnBiconjugateGradient;
 import jv.geom.PgElementSet;
@@ -208,9 +209,12 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 			temp.setEntry(0, G.getEntry(i, elements[i].getEntry(0)));
 			temp.setEntry(1, G.getEntry(i, elements[i].getEntry(1)));
 			temp.setEntry(2, G.getEntry(i, elements[i].getEntry(2)));
+			// Original gradient:
+			PsDebug.message(temp.toString());
+
 			// Apply matrix to x gradient
 			PnSparseMatrix.rightMultVector(a, temp, g_tilde_temp);
-			// Set transfromed values into vector
+			// Set transformed values into vector
 			g_tilde.setEntry(i*3, g_tilde_temp.getEntry(0));
 			g_tilde.setEntry(i*3+1, g_tilde_temp.getEntry(1));
 			g_tilde.setEntry(i*3+2, g_tilde_temp.getEntry(2));
@@ -220,10 +224,19 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 
 		PdVector rightSideVector = PnSparseMatrix.rightMultVector(rightSideMatrix, g_tilde, null);
 		PdVector x_tilde = new PdVector(rightSideVector.getSize());
-		// Solve x gradient:
+
 		PnBiconjugateGradient solver = new PnBiconjugateGradient();
 		solver.solve(leftSideMatrix, x_tilde, g_tilde);
 
+		// Resulting X coordinates
+		PsDebug.message("Resulting X coordinates");
+		PsDebug.message(x_tilde.toString());
+
+		// Original X coordinates
+		PsDebug.message("Original X coordinates");
+		PsDebug.message("" + m_geom.getVertex(elements[0].getEntry(0)).getEntry(0));
+		PsDebug.message("" + m_geom.getVertex(elements[0].getEntry(1)).getEntry(0));
+		PsDebug.message("" + m_geom.getVertex(elements[0].getEntry(2)).getEntry(0));
 
 
 
@@ -254,7 +267,6 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 			PdVector ytilde = new PdVector();
 			PdVector ztilde = new PdVector();
 			try {
-				solver.solve(G, xtilde, gtildex);
 //				long factorization = PnMumpsSolver.factor(G, PnMumpsSolver.Type.GENERAL_SYMMETRIC);
 //
 //				PnMumpsSolver.solve(factorization, xtilde, gtildex);
