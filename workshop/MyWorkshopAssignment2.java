@@ -111,21 +111,23 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 
 
 
-		//wrong entries for now, check with new mesh
+
+		//TEST FOR CORRECT GRADIENT PER FACE, uncomment to see the result in debug
+		//screen. This is commented because it will slow down the making of Big G.
+		/*
 		PdVector function = new PdVector(3);
-		function.setEntry(0, m_geom.getVectorField(1).getVector(0).getEntry(0));
-		function.setEntry(1, m_geom.getVectorField(1).getVector(2).getEntry(0));
-		function.setEntry(2, m_geom.getVectorField(1).getVector(1).getEntry(0));
-
-		PsDebug.message(Double.toString(m_geom.getVectorField(1).getVector(0).getEntry(0)));
-
-		PsDebug.message( Double.toString(m_geom.getVectorField(1).getVector(1).getEntry(0)));
-
-		PsDebug.message( Double.toString(m_geom.getVectorField(1).getVector(2).getEntry(0)));
+		function.setEntry(0, m_geom.getVectorField(0).getVector(0).getEntry(0));
+		function.setEntry(1, m_geom.getVectorField(0).getVector(1).getEntry(0));
+		function.setEntry(2, m_geom.getVectorField(0).getVector(2).getEntry(0));
 
 
-
+		PsDebug.message(Double.toString(m_geom.getVectorField(0).getVector(0).getEntry(0)));
+		PsDebug.message( Double.toString(m_geom.getVectorField(0).getVector(1).getEntry(0)));
+		PsDebug.message( Double.toString(m_geom.getVectorField(0).getVector(2).getEntry(0)));
 		PsDebug.message(R.toString());
+		PnSparseMatrix R2 = R;
+		PsDebug.message(PnSparseMatrix.rightMultVector(R2, function, null).toString());
+		*/
 
 		return R;
 	}
