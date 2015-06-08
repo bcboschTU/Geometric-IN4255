@@ -65,7 +65,7 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 	// re2 = R . e2
 	// re3 = R . e3
 	//G = Transpose[1/2area(T) * {re1, re2, re3} ]
-	private PdVector calculateGradient(PiVector element) {
+	private PnSparseMatrix calculateGradient(PiVector element) {
 		PdVector normal = m_geom.getElementNormal(0);
 
 		PnSparseMatrix R = new PnSparseMatrix(3, 3, 3);
@@ -125,7 +125,7 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 
 		PsDebug.message(R.toString());
 
-		return PnSparseMatrix.rightMultVector(R, function, null);
+		return R;
 	}
 
 	private double calculateDistance(PdVector point1,PdVector point2){
@@ -145,10 +145,18 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 		PnSparseMatrix G = new PnSparseMatrix(n, m, 3);
 
 		PiVector [] elements = m_geom.getElements();
-		PiVector element = elements[0];
+		for(int i = 0; i < elements.length ; i++) {
+			PnSparseMatrix gradient = calculateGradient(elements[i]);
+			PsDebug.message(gradient.toString());
 
-		PsDebug.message(calculateGradient(element).toString());
+			G.addEntry(i, elements[i].getEntry(0), gradient.);
+			G.addEntry(i, elements[i].getEntry(1), gradient);
+			G.addEntry(i, elements[i].getEntry(2), gradient);
+			// Add calculated gradient to the sparse matrix G
+		}
 
+		PsDebug.message("Sparse matrix G:");
+		PsDebug.message(G.toString());
 
 		/*You can use the method addEntry(int k, int l, double value) for
 		constructing the matrix. The method adds value at position k; l in the
@@ -169,17 +177,6 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 	}
 
 	/*
-	As a first step, compute the 3x3 matrix that maps a linear polynomial
-	over a triangle to its gradient vector. Then use this method to compute the
-	matrix G for a triangle mesh.
-	*/
-	private PnSparseMatrix mapTriangleToGradient(PdVector a, PdVector b, PdVector c) {
-		PnSparseMatrix matrix = new PnSparseMatrix(3, 3, 3);
-
-		return matrix;
-	}
-
-	/*
 	Implement a tool for editing triangle meshes (a simplified version of the
 	brushes tool we discussed in the lecture). It should allow to specify a 3x3
 	matrix A, which is applied to the gradient vectors of all selected triangles
@@ -192,6 +189,13 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 	mesh constant.
 	*/
 	public void editTriangleMesh(PnSparseMatrix a) {
+		PnSparseMatrix G = calculateLinearPolynomialGradients();
+
+		G.transpose();
+
+		// Calculate weight matrix, diagonal matrix with area of each triangle on element index
+		//PnSparseMatrix M =
+
 		/*For solving the sparse linear systems (Task 2), you can use
 		dev6.numeric.PnMumpsSolver. This class offers an interface to the direct
 		solvers of the MUMPS library. To solve the system Ax = b, you can use the
