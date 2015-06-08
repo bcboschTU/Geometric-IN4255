@@ -1,6 +1,7 @@
 package workshop;
 
 import jv.geom.PgElementSet;
+import jv.object.PsObject;
 import jv.project.PgGeometry;
 import jv.vecmath.PdMatrix;
 import jv.vecmath.PdVector;
@@ -198,6 +199,9 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 		// Calculate weight matrix, diagonal matrix with area of each triangle on element index
 		//PnSparseMatrix M =
 
+		PiVector[] selectedElements = getSelectedElements();
+		PsDebug.message("Selected Elements: " + selectedElements.length);
+
 		/*For solving the sparse linear systems (Task 2), you can use
 		dev6.numeric.PnMumpsSolver. This class offers an interface to the direct
 		solvers of the MUMPS library. To solve the system Ax = b, you can use the
@@ -215,5 +219,18 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 		jvx.numeric.PnBiconjugateGradient instead. However, this is less efficient (do not use too large meshes in this case).*/
 
 		PsDebug.message(a.toString());
+	}
+
+	private PiVector[] getSelectedElements() {
+		PiVector[] elements = m_geom.getElements();
+		ArrayList<PiVector> selectedElements = new ArrayList<>();
+		for(int i = 0; i < elements.length ; i++) {
+			if (elements[i].hasTag(PsObject.IS_SELECTED)) {
+				selectedElements.add(elements[i]);
+			}
+		}
+
+		PiVector[] array = new PiVector[selectedElements.size()];
+		return selectedElements.toArray(array);
 	}
 }
