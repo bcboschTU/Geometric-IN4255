@@ -140,7 +140,7 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 	linear polynomial over all triangles of a mesh to its gradient vectors.
 			*/
 	public PnSparseMatrix calculateLinearPolynomialGradients() {
-		int n = 3 * (2 - m_geom.getNumVertices() + m_geom.getNumEdges());
+		int n = 3 * m_geom.getNumElements();
 		int m = m_geom.getNumVertices();
 		PnSparseMatrix G = new PnSparseMatrix(n, m, 3);
 
@@ -149,9 +149,15 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 			PnSparseMatrix gradient = calculateGradient(elements[i]);
 			PsDebug.message(gradient.toString());
 
-			G.addEntry(i, elements[i].getEntry(0), gradient.);
-			G.addEntry(i, elements[i].getEntry(1), gradient);
-			G.addEntry(i, elements[i].getEntry(2), gradient);
+			G.addEntry((3 * i), elements[i].getEntry(0), gradient.getEntry(0, 0));
+			G.addEntry((3 * i) + 1, elements[i].getEntry(0), gradient.getEntry(1, 0));
+			G.addEntry((3 * i) + 2, elements[i].getEntry(0), gradient.getEntry(2, 0));
+			G.addEntry((3 * i), elements[i].getEntry(1), gradient.getEntry(0, 1));
+			G.addEntry((3 * i) + 1, elements[i].getEntry(1), gradient.getEntry(1, 1));
+			G.addEntry((3 * i) + 2, elements[i].getEntry(1), gradient.getEntry(2, 1));
+			G.addEntry((3 * i), elements[i].getEntry(2), gradient.getEntry(0, 2));
+			G.addEntry((3 * i) + 1, elements[i].getEntry(2), gradient.getEntry(1, 2));
+			G.addEntry((3 * i) + 2, elements[i].getEntry(2), gradient.getEntry(2, 2));
 			// Add calculated gradient to the sparse matrix G
 		}
 
