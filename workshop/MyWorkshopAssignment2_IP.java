@@ -127,7 +127,7 @@ public class MyWorkshopAssignment2_IP extends PjWorkshop_IP implements ActionLis
 	public void actionPerformed(ActionEvent event) {
 		Object source = event.getSource();
 		if(source == m_bSparseMatrix){
-			PsDebug.message(m_ws.calculateLinearPolynomialGradients().toString());
+			m_ws.calculateLinearPolynomialGradients();
 			m_ws.m_geom.update(m_ws.m_geom);
 			return;
 		}
