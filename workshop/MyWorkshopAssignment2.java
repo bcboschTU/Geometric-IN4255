@@ -1,6 +1,7 @@
 package workshop;
 
-import dev6.numeric.PnMumpsSolver;
+//import dev6.numeric.PnMumpsSolver;
+import jvx.numeric.PnBiconjugateGradient;
 import jv.geom.PgElementSet;
 import jv.object.PsObject;
 import jv.project.PgGeometry;
@@ -194,14 +195,15 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 	*/
 	public void editTriangleMesh(PnSparseMatrix a) {
 		PnSparseMatrix G = calculateLinearPolynomialGradients();
-
-		G.transpose();
+		PnSparseMatrix G_transpose = new PnSparseMatrix();
+		G_transpose.copy(G);
+		G_transpose.transpose();
 
 		// Calculate weight matrix, diagonal matrix with area of each triangle on element index
 		int n = 3 * m_geom.getNumElements();
 		int m = m_geom.getNumVertices();
 		PnSparseMatrix M = new PnSparseMatrix(n, m, 3);
-		for (int i = 0; i < m_geom.getNumElements() ; i++ ) {
+		for (int i = 0; i < m_geom.getNumElements(); i++) {
 			M.setEntry((i * 3), (i * 3), m_geom.getAreaOfElement(i));
 			M.setEntry((i * 3) + 1, (i * 3) + 1, m_geom.getAreaOfElement(i));
 			M.setEntry((i * 3) + 2, (i * 3) + 2, m_geom.getAreaOfElement(i));
@@ -212,6 +214,42 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 
 		PiVector[] selectedElements = getSelectedElements();
 		PsDebug.message("Selected Elements: " + selectedElements.length);
+
+		// Calculate right side of equation G_tranposed * WeightMatrix * G * X_tilde = G_tranposed * WeightMatrix * g_tilde
+		PnSparseMatrix rightSideMatrix = PnSparseMatrix.multMatrices(G_transpose, M, null);
+
+		PnSparseMatrix leftSideMatrix = PnSparseMatrix.multMatrices(G_transpose, PnSparseMatrix.multMatrices(M, G, null), null);
+
+		PdVector g_tilde = new PdVector(m_geom.getNumElements()*3);
+		PiVector[] elements = m_geom.getElements();
+		// Calculate x gradient:
+		// deformation matrix a moet vermenigvuldigen met x, y en z waarden en niet met alleen x waarden
+		for (int i = 0; i < elements.length; i++) {
+			PdVector temp = new PdVector(3);
+			PdVector g_tilde_temp = new PdVector(3);
+			// Extract gradient from sparse matrix
+			temp.setEntry(0, G.getEntry(i, elements[i].getEntry(0)));
+			temp.setEntry(1, G.getEntry(i, elements[i].getEntry(1)));
+			temp.setEntry(2, G.getEntry(i, elements[i].getEntry(2)));
+			// Apply matrix to x gradient
+			PnSparseMatrix.rightMultVector(a, temp, g_tilde_temp);
+			// Set transfromed values into vector
+			g_tilde.setEntry(i*3, g_tilde_temp.getEntry(0));
+			g_tilde.setEntry(i*3+1, g_tilde_temp.getEntry(1));
+			g_tilde.setEntry(i*3+2, g_tilde_temp.getEntry(2));
+		}
+		PsDebug.message("g_tilde ");
+		PsDebug.message(g_tilde.toString());
+
+		PdVector rightSideVector = PnSparseMatrix.rightMultVector(rightSideMatrix, g_tilde, null);
+		PdVector x_tilde = new PdVector(rightSideVector.getSize());
+		// Solve x gradient:
+		PnBiconjugateGradient solver = new PnBiconjugateGradient();
+		solver.solve(leftSideMatrix, x_tilde, g_tilde);
+
+
+
+
 
 		for (PiVector element : selectedElements) {
 			// Create gradient vectors from positions
@@ -239,11 +277,12 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 			PdVector ytilde = new PdVector();
 			PdVector ztilde = new PdVector();
 			try {
-				long factorization = PnMumpsSolver.factor(G, PnMumpsSolver.Type.GENERAL_SYMMETRIC);
-
-				PnMumpsSolver.solve(factorization, xtilde, gtildex);
-				PnMumpsSolver.solve(factorization, ytilde, gtildey);
-				PnMumpsSolver.solve(factorization, ztilde, gtildez);
+				solver.solve(G, xtilde, gtildex);
+//				long factorization = PnMumpsSolver.factor(G, PnMumpsSolver.Type.GENERAL_SYMMETRIC);
+//
+//				PnMumpsSolver.solve(factorization, xtilde, gtildex);
+//				PnMumpsSolver.solve(factorization, ytilde, gtildey);
+//				PnMumpsSolver.solve(factorization, ztilde, gtildez);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
