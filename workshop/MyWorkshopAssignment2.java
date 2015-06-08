@@ -1,5 +1,6 @@
 package workshop;
 
+import dev6.numeric.PnMumpsSolver;
 import jv.geom.PgElementSet;
 import jv.object.PsObject;
 import jv.project.PgGeometry;
@@ -212,6 +213,50 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 		PiVector[] selectedElements = getSelectedElements();
 		PsDebug.message("Selected Elements: " + selectedElements.length);
 
+		for (PiVector element : selectedElements) {
+			// Create gradient vectors from positions
+			PdVector gx = new PdVector();
+			PdVector gy = new PdVector();
+			PdVector gz = new PdVector();
+
+			for (int e = 0; e < 3; e++) {
+				PdVector p = m_geom.getVertex(element.getEntry(e));
+				gx.setEntry(e, p.getEntry(0));
+				gy.setEntry(e, p.getEntry(1));
+				gz.setEntry(e, p.getEntry(2));
+			}
+
+			// Apply matrix to gradient vectors
+			PdVector gtildex = new PdVector();
+			PdVector gtildey = new PdVector();
+			PdVector gtildez = new PdVector();
+			PnSparseMatrix.rightMultVector(a, gx, gtildex);
+			PnSparseMatrix.rightMultVector(a, gy, gtildey);
+			PnSparseMatrix.rightMultVector(a, gz, gtildez);
+
+			// Solve for new vertex positions
+			PdVector xtilde = new PdVector();
+			PdVector ytilde = new PdVector();
+			PdVector ztilde = new PdVector();
+			try {
+				long factorization = PnMumpsSolver.factor(G, PnMumpsSolver.Type.GENERAL_SYMMETRIC);
+
+				PnMumpsSolver.solve(factorization, xtilde, gtildex);
+				PnMumpsSolver.solve(factorization, ytilde, gtildey);
+				PnMumpsSolver.solve(factorization, ztilde, gtildez);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			// Set new vertex positions
+			for (int e = 0; e < 3; e++) {
+				PdVector p = m_geom.getVertex(element.getEntry(e));
+				p.setEntry(0, xtilde.getEntry(e));
+				p.setEntry(1, ytilde.getEntry(e));
+				p.setEntry(2, ztilde.getEntry(e));
+			}
+		}
+
 		/*For solving the sparse linear systems (Task 2), you can use
 		dev6.numeric.PnMumpsSolver. This class offers an interface to the direct
 		solvers of the MUMPS library. To solve the system Ax = b, you can use the
@@ -227,8 +272,6 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 		on other libraries including gcc and gfortran.
 		If the MUMPS library does not work on your system, you can use
 		jvx.numeric.PnBiconjugateGradient instead. However, this is less efficient (do not use too large meshes in this case).*/
-
-		PsDebug.message(a.toString());
 	}
 
 	private PiVector[] getSelectedElements() {
