@@ -179,8 +179,7 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 
 		// Calculate weight matrix, diagonal matrix with area of each triangle on element index
 		int n = 3 * m_geom.getNumElements();
-		int m = m_geom.getNumVertices();
-		PnSparseMatrix M = new PnSparseMatrix(n, m, 3);
+		PnSparseMatrix M = new PnSparseMatrix(n, n, 3);
 		for (int i = 0; i < m_geom.getNumElements(); i++) {
 			M.setEntry((i * 3), (i * 3), m_geom.getAreaOfElement(i));
 			M.setEntry((i * 3) + 1, (i * 3) + 1, m_geom.getAreaOfElement(i));
