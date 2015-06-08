@@ -132,7 +132,6 @@ public class MyWorkshopAssignment2_IP extends PjWorkshop_IP implements ActionLis
 			return;
 		}
 		else if(source == m_bMeshEditing){
-			PsDebug.message(mesh_matrix_1_1.getText());
 			PnSparseMatrix a = new PnSparseMatrix(3,3);
 			a.setEntry(0,0, Double.parseDouble(mesh_matrix_1_1.getText()));
 			a.setEntry(0,1, Double.parseDouble(mesh_matrix_1_2.getText()));
