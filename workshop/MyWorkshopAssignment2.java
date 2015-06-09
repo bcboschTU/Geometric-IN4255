@@ -190,6 +190,33 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 		PsDebug.message("Weight matrix M:");
 		PsDebug.message(M.toString());
 
+		PiVector[] elements = m_geom.getElements();
+		PdVector[] vertices = m_geom.getVertices();
+		// Calculate x,y and z gradient vector x_gradiant:
+		PdVector x_gradiant = new PdVector(3 * m_geom.getNumElements());
+		PdVector y_gradiant = new PdVector(3 * m_geom.getNumElements());
+		PdVector z_gradiant = new PdVector(3 * m_geom.getNumElements());
+		for (int i = 0; i < elements.length; i++) {
+			// Set transformed values into vector
+			x_gradiant.setEntry(i * 3, vertices[elements[i].getEntry(0)].getEntry(0));
+			x_gradiant.setEntry(i * 3 + 1, vertices[elements[i].getEntry(1)].getEntry(0));
+			x_gradiant.setEntry(i * 3 + 2, vertices[elements[i].getEntry(2)].getEntry(0));
+
+			y_gradiant.setEntry(i * 3, vertices[elements[i].getEntry(0)].getEntry(1));
+			y_gradiant.setEntry(i * 3 + 1, vertices[elements[i].getEntry(1)].getEntry(1));
+			y_gradiant.setEntry(i * 3 + 2, vertices[elements[i].getEntry(2)].getEntry(1));
+
+			z_gradiant.setEntry(i * 3, vertices[elements[i].getEntry(0)].getEntry(2));
+			z_gradiant.setEntry(i * 3 + 1, vertices[elements[i].getEntry(1)].getEntry(2));
+			z_gradiant.setEntry(i * 3 + 2, vertices[elements[i].getEntry(2)].getEntry(2));
+		}
+
+		PsDebug.message("Resulting positional values:");
+		PsDebug.message(x_gradiant.toString());
+		PsDebug.message(y_gradiant.toString());
+		PsDebug.message(z_gradiant.toString());
+
+		// Apply transformation matrix to the selected elements:
 		PiVector[] selectedElements = getSelectedElements();
 		PsDebug.message("Selected Elements: " + selectedElements.length);
 
@@ -239,55 +266,6 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 		PsDebug.message("" + m_geom.getVertex(elements[0].getEntry(0)).getEntry(0));
 		PsDebug.message("" + m_geom.getVertex(elements[0].getEntry(1)).getEntry(0));
 		PsDebug.message("" + m_geom.getVertex(elements[0].getEntry(2)).getEntry(0));
-
-
-
-/*
-
-		for (PiVector element : selectedElements) {
-			// Create gradient vectors from positions
-			PdVector gx = new PdVector();
-			PdVector gy = new PdVector();
-			PdVector gz = new PdVector();
-
-			for (int e = 0; e < 3; e++) {
-				PdVector p = m_geom.getVertex(element.getEntry(e));
-				gx.setEntry(e, p.getEntry(0));
-				gy.setEntry(e, p.getEntry(1));
-				gz.setEntry(e, p.getEntry(2));
-			}
-
-			// Apply matrix to gradient vectors
-			PdVector gtildex = new PdVector();
-			PdVector gtildey = new PdVector();
-			PdVector gtildez = new PdVector();
-			PnSparseMatrix.rightMultVector(a, gx, gtildex);
-			PnSparseMatrix.rightMultVector(a, gy, gtildey);
-			PnSparseMatrix.rightMultVector(a, gz, gtildez);
-
-			// Solve for new vertex positions
-			PdVector xtilde = new PdVector();
-			PdVector ytilde = new PdVector();
-			PdVector ztilde = new PdVector();
-			try {
-//				long factorization = PnMumpsSolver.factor(G, PnMumpsSolver.Type.GENERAL_SYMMETRIC);
-//
-//				PnMumpsSolver.solve(factorization, xtilde, gtildex);
-//				PnMumpsSolver.solve(factorization, ytilde, gtildey);
-//				PnMumpsSolver.solve(factorization, ztilde, gtildez);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-			// Set new vertex positions
-			for (int e = 0; e < 3; e++) {
-				PdVector p = m_geom.getVertex(element.getEntry(e));
-				p.setEntry(0, xtilde.getEntry(e));
-				p.setEntry(1, ytilde.getEntry(e));
-				p.setEntry(2, ztilde.getEntry(e));
-			}
-		}
-*/
 
 		/*For solving the sparse linear systems (Task 2), you can use
 		dev6.numeric.PnMumpsSolver. This class offers an interface to the direct
