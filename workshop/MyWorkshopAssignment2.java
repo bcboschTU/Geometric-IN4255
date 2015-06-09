@@ -175,18 +175,7 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 	public void editTriangleMesh(PnSparseMatrix a) {
 		PnSparseMatrix G = calculateLinearPolynomialGradients();
 		PnSparseMatrix G_transpose = G.transposeNew();
-
-		// Calculate weight matrix, diagonal matrix with area of each triangle on element index
-		int n = 3 * m_geom.getNumElements();
-		PnSparseMatrix M = new PnSparseMatrix(n, n, 3);
-		for (int i = 0; i < m_geom.getNumElements(); i++) {
-			M.setEntry((i * 3), (i * 3), m_geom.getAreaOfElement(i));
-			M.setEntry((i * 3) + 1, (i * 3) + 1, m_geom.getAreaOfElement(i));
-			M.setEntry((i * 3) + 2, (i * 3) + 2, m_geom.getAreaOfElement(i));
-		}
-
-		PsDebug.message("Weight matrix M:");
-		PsDebug.message(M.toString());
+		PnSparseMatrix M = getMvMatrix();
 
 		PiVector[] elements = m_geom.getElements();
 		PdVector[] vertices = m_geom.getVertices();
@@ -194,7 +183,6 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 		PdVector x_positional = new PdVector(m_geom.getNumVertices());
 		PdVector y_positional = new PdVector(m_geom.getNumVertices());
 		PdVector z_positional = new PdVector(m_geom.getNumVertices());
-
 
 
 		PdVector sum = new PdVector(3);
@@ -219,39 +207,11 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 		new_mean.setEntry(1, sum.getEntry(1) / vertices.length);
 		new_mean.setEntry(2, sum.getEntry(2) / vertices.length);
 
-		PsDebug.message("Mean of new positions");
-		PsDebug.message("" + new_mean);
-
-		/*
-		for (int i = 0; i < elements.length; i++) {
-			// Set transformed values into vector
-			x_positional.setEntry(i * 3, vertices[elements[i].getEntry(0)].getEntry(0));
-			x_positional.setEntry(i * 3 + 1, vertices[elements[i].getEntry(1)].getEntry(0));
-			x_positional.setEntry(i * 3 + 2, vertices[elements[i].getEntry(2)].getEntry(0));
-
-			y_positional.setEntry(i * 3, vertices[elements[i].getEntry(0)].getEntry(1));
-			y_positional.setEntry(i * 3 + 1, vertices[elements[i].getEntry(1)].getEntry(1));
-			y_positional.setEntry(i * 3 + 2, vertices[elements[i].getEntry(2)].getEntry(1));
-
-			z_positional.setEntry(i * 3, vertices[elements[i].getEntry(0)].getEntry(2));
-			z_positional.setEntry(i * 3 + 1, vertices[elements[i].getEntry(1)].getEntry(2));
-			z_positional.setEntry(i * 3 + 2, vertices[elements[i].getEntry(2)].getEntry(2));
-		}
-		*/
-
-		PsDebug.message("Resulting positional values:");
-		PsDebug.message(x_positional.toString());
-		PsDebug.message(y_positional.toString());
-		PsDebug.message(z_positional.toString());
 
 		PdVector g_x = PnSparseMatrix.rightMultVector(G, x_positional, null);
 		PdVector g_y = PnSparseMatrix.rightMultVector(G, y_positional, null);
 		PdVector g_z = PnSparseMatrix.rightMultVector(G, z_positional, null);
 
-		PsDebug.message("Resulting gradiant vectors:");
-		PsDebug.message(g_x.toString());
-		PsDebug.message(g_y.toString());
-		PsDebug.message(g_z.toString());
 
 		// Apply transformation matrix to the selected elements:
 		for(int i = 0; i < elements.length; i++) {
@@ -262,11 +222,6 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 			}
 		}
 
-		PsDebug.message("Resulting gradiant vectors after transformation matrix:");
-		PsDebug.message(g_x.toString());
-		PsDebug.message(g_y.toString());
-		PsDebug.message(g_z.toString());
-
 		// Complete right hand side computation of equation:
 		PdVector Mg_x = PnSparseMatrix.rightMultVector(M, g_x, null);
 		PdVector Mg_y = PnSparseMatrix.rightMultVector(M, g_y, null);
@@ -276,16 +231,8 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 		PdVector rightSideResult_y = PnSparseMatrix.rightMultVector(G_transpose, Mg_y, null);
 		PdVector rightSideResult_z = PnSparseMatrix.rightMultVector(G_transpose, Mg_z, null);
 
-
-		PsDebug.message("Resulting rightside vectors:");
-		PsDebug.message(rightSideResult_x.toString());
-		PsDebug.message(rightSideResult_y.toString());
-		PsDebug.message(rightSideResult_z.toString());
-
 		// Calculate left hand side matrix
 		PnSparseMatrix leftSideMatrix = PnSparseMatrix.multMatrices(G_transpose, PnSparseMatrix.multMatrices(M, G, null), null);
-		PsDebug.message("Resulting left side matrix:");
-		PsDebug.message(leftSideMatrix.toString());
 
 		PdVector x_tilde = new PdVector(rightSideResult_x.getSize());
 		PdVector y_tilde = new PdVector(rightSideResult_y.getSize());
@@ -293,74 +240,14 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 
 		PnBiconjugateGradient solver = new PnBiconjugateGradient();
 
-		// Solve for x_tilde:
+		// Solve for all
 		solver.solve(leftSideMatrix, x_tilde, rightSideResult_x);
-
-		// Solve for y_tilde:
 		solver.solve(leftSideMatrix, y_tilde, rightSideResult_y);
-
-		// Solve for z_tilde
 		solver.solve(leftSideMatrix, z_tilde, rightSideResult_z);
 
-		// Resulting coordinates
-		PsDebug.message("Resulting coordinates");
-		PsDebug.message(x_tilde.toString());
-		PsDebug.message(y_tilde.toString());
-		PsDebug.message(z_tilde.toString());
-
-		// Calculate mean position of resulting coordinates
-
-
 		// Calculate mean position of original coordinates
-		PdVector sum2 = new PdVector(3);
-		for(int i = 0; i < vertices.length; i++) {
-			sum2.setEntry(0, sum2.getEntry(0) + x_tilde.getEntry(i));
-			sum2.setEntry(1, sum2.getEntry(1) + y_tilde.getEntry(i));
-			sum2.setEntry(2, sum2.getEntry(2) + z_tilde.getEntry(i));
-		}
-		PdVector old_mean = new PdVector(3);
-		old_mean.setEntry(0, sum2.getEntry(0) /vertices.length);
-		old_mean.setEntry(1, sum2.getEntry(1) /vertices.length);
-		old_mean.setEntry(2, sum2.getEntry(2) / vertices.length);
-
-		PsDebug.message("Mean of old positions");
-		PsDebug.message("" + old_mean);
-
-		PdVector translation = new PdVector(3);
-		translation.setEntry(0, old_mean.getEntry(0) - new_mean.getEntry(0));
-		translation.setEntry(1, old_mean.getEntry(1) - new_mean.getEntry(1));
-		translation.setEntry(2, old_mean.getEntry(2) - new_mean.getEntry(2));
-
-		PsDebug.message("Translation vector");
-		PsDebug.message("" + translation);
-
-		PsDebug.message("x_tilde: ");
-		PsDebug.message("" + x_tilde);
-
-		// Apply new coordinates to the geometry:
-//		for (int i = 0; i < elements.length; i++) {
-//			// Set transformed values into vector
-//			PdVector temp = new PdVector(3);
-//			temp.setEntry(0, x_tilde.getEntry(i * 3) + translation.getEntry(0));
-//			temp.setEntry(1, y_tilde.getEntry(i * 3) + translation.getEntry(1));
-//			temp.setEntry(2, z_tilde.getEntry(i * 3) + translation.getEntry(2));
-//			// Set first vector of element
-//			m_geom.setVertex(elements[i].getEntry(0), temp);
-//
-//			temp.setEntry(0, x_tilde.getEntry((i * 3) + 1) + translation.getEntry(0));
-//			temp.setEntry(1, y_tilde.getEntry((i * 3) + 1) + translation.getEntry(1));
-//			temp.setEntry(2, z_tilde.getEntry((i * 3) + 1) + translation.getEntry(2));
-//
-//			// Set second vector of element
-//			m_geom.setVertex(elements[i].getEntry(1), temp);
-//
-//			temp.setEntry(0, x_tilde.getEntry((i * 3) + 2) + translation.getEntry(0));
-//			temp.setEntry(1, y_tilde.getEntry((i * 3) + 2) + translation.getEntry(1));
-//			temp.setEntry(2, z_tilde.getEntry((i * 3) + 2) + translation.getEntry(2));
-//
-//			// Set third vector of element
-//			m_geom.setVertex(elements[i].getEntry(2), temp);
-//		}
+		PdVector old_mean  = calculate_oldMean(x_tilde, y_tilde, z_tilde);
+		PdVector translation = calculateTranslation(new_mean, old_mean);
 
 		for (int i = 0; i < x_tilde.getSize(); i++) {
 			m_geom.setVertex(i, new PdVector(x_tilde.getEntry(i) + translation.getEntry(0),
@@ -379,5 +266,41 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 		vector.setEntry((index * 3), temp.getEntry(0));
 		vector.setEntry((index * 3) + 1, temp.getEntry(1));
 		vector.setEntry((index * 3) + 2, temp.getEntry(2));
+	}
+
+	public PdVector calculate_oldMean(PdVector x_tilde, PdVector y_tilde, PdVector z_tilde){
+		PdVector[] vertices = m_geom.getVertices();
+		PdVector sum2 = new PdVector(3);
+		for(int i = 0; i < vertices.length; i++) {
+			sum2.setEntry(0, sum2.getEntry(0) + x_tilde.getEntry(i));
+			sum2.setEntry(1, sum2.getEntry(1) + y_tilde.getEntry(i));
+			sum2.setEntry(2, sum2.getEntry(2) + z_tilde.getEntry(i));
+		}
+		PdVector old_mean = new PdVector(3);
+		old_mean.setEntry(0, sum2.getEntry(0) /vertices.length);
+		old_mean.setEntry(1, sum2.getEntry(1) /vertices.length);
+		old_mean.setEntry(2, sum2.getEntry(2) / vertices.length);
+		return old_mean;
+	}
+
+	// Calculate weight matrix, diagonal matrix with area of each triangle on element index
+	public PnSparseMatrix getMvMatrix(){
+		int n = 3 * m_geom.getNumElements();
+		PnSparseMatrix M = new PnSparseMatrix(n, n, 3);
+		for (int i = 0; i < m_geom.getNumElements(); i++) {
+			M.setEntry((i * 3), (i * 3), m_geom.getAreaOfElement(i));
+			M.setEntry((i * 3) + 1, (i * 3) + 1, m_geom.getAreaOfElement(i));
+			M.setEntry((i * 3) + 2, (i * 3) + 2, m_geom.getAreaOfElement(i));
+		}
+		return M;
+	}
+
+	public PdVector calculateTranslation(PdVector new_mean, PdVector old_mean){
+		PdVector translation = new PdVector(3);
+		translation.setEntry(0, new_mean.getEntry(0) - old_mean.getEntry(0));
+		translation.setEntry(1, new_mean.getEntry(1) - old_mean.getEntry(1));
+		translation.setEntry(2, new_mean.getEntry(2) - old_mean.getEntry(2));
+
+		return translation;
 	}
 }
