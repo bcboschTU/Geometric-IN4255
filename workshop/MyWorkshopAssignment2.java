@@ -226,7 +226,6 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 		PsDebug.message(g_z.toString());
 
 		// Apply transformation matrix to the selected elements:
-		// TODO: add for loop for selected elements and apply transformation matrix
 		for(int i = 0; i < elements.length; i++) {
 			if (elements[i].hasTag(PsObject.IS_SELECTED)) {
 				applyTransformationMatrix(g_x, a, i);
@@ -269,27 +268,78 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 		// Solve for z_tilde
 		solver.solve(leftSideMatrix, z_tilde, rightSideResult_z);
 
-		// Resulting X coordinates
+		// Resulting coordinates
 		PsDebug.message("Resulting coordinates");
 		PsDebug.message(x_tilde.toString());
 		PsDebug.message(y_tilde.toString());
 		PsDebug.message(z_tilde.toString());
 
-		/*For solving the sparse linear systems (Task 2), you can use
-		dev6.numeric.PnMumpsSolver. This class offers an interface to the direct
-		solvers of the MUMPS library. To solve the system Ax = b, you can use the
-		method solve(A, x, b, PnMumpsSolver.Type.GENERAL SYMMETRIC).
-		For solving a number of systems with the same matrix, compute the factorization once using:
-		- public static long factor(PnSparseMatrix matrix, Type sym)
-		and use
-		- public static native void solve(long factorization, PdVector x, PdVector b)
-		for solving the systems.
-		The MUMPS library should work on WINDOWS 64-bit systems. For MAC,
-		I added the file libMumpsJNI.jnilib to blackboard. Please copy the le to
-		the "dll"folder. This file may not work on your MAC, because it depends
-		on other libraries including gcc and gfortran.
-		If the MUMPS library does not work on your system, you can use
-		jvx.numeric.PnBiconjugateGradient instead. However, this is less efficient (do not use too large meshes in this case).*/
+		// Calculate mean position of resulting coordinates
+		PdVector sum = new PdVector(3);
+		for(int i = 0; i < vertices.length; i++) {
+			sum.setEntry(0, sum.getEntry(0) + x_tilde.getEntry(i));
+			sum.setEntry(1, sum.getEntry(1) + y_tilde.getEntry(i));
+			sum.setEntry(2, sum.getEntry(2) + z_tilde.getEntry(i));
+		}
+		PdVector new_mean = new PdVector(3);
+		new_mean.setEntry(0, sum.getEntry(0) / vertices.length);
+		new_mean.setEntry(1, sum.getEntry(1) / vertices.length);
+		new_mean.setEntry(2, sum.getEntry(2) / vertices.length);
+
+		PsDebug.message("Mean of new positions");
+		PsDebug.message("" + new_mean);
+
+		// Calculate mean position of original coordinates
+		sum = new PdVector(3);
+		for(int i = 0; i < vertices.length; i++) {
+			sum.setEntry(0, sum.getEntry(0) + vertices[i].getEntry(0));
+			sum.setEntry(1, sum.getEntry(1) + vertices[i].getEntry(1));
+			sum.setEntry(2, sum.getEntry(2) + vertices[i].getEntry(2));
+		}
+		PdVector old_mean = new PdVector(3);
+		old_mean.setEntry(0, sum.getEntry(0) /vertices.length);
+		old_mean.setEntry(1, sum.getEntry(1) /vertices.length);
+		old_mean.setEntry(2, sum.getEntry(2) / vertices.length);
+
+		PsDebug.message("Mean of old positions");
+		PsDebug.message("" + old_mean);
+
+		PdVector translation = new PdVector(3);
+		translation.setEntry(0, old_mean.getEntry(0) - new_mean.getEntry(0));
+		translation.setEntry(1, old_mean.getEntry(1) - new_mean.getEntry(1));
+		translation.setEntry(2, old_mean.getEntry(2) - new_mean.getEntry(2));
+
+		PsDebug.message("Translation vector");
+		PsDebug.message("" + translation);
+
+		// Apply new coordinates to the geometry:
+//		for (int i = 0; i < elements.length; i++) {
+//			// Set transformed values into vector
+//			PdVector temp = new PdVector(3);
+//			temp.setEntry(0, x_tilde.getEntry(i * 3) + translation.getEntry(0));
+//			temp.setEntry(1, y_tilde.getEntry(i * 3) + translation.getEntry(1));
+//			temp.setEntry(2, z_tilde.getEntry(i * 3) + translation.getEntry(2));
+//			// Set first vector of element
+//			m_geom.setVertex(elements[i].getEntry(0), temp);
+//
+//			temp.setEntry(0, x_tilde.getEntry((i * 3) + 1) + translation.getEntry(0));
+//			temp.setEntry(1, y_tilde.getEntry((i * 3) + 1) + translation.getEntry(1));
+//			temp.setEntry(2, z_tilde.getEntry((i * 3) + 1) + translation.getEntry(2));
+//
+//			// Set second vector of element
+//			m_geom.setVertex(elements[i].getEntry(1), temp);
+//
+//			temp.setEntry(0, x_tilde.getEntry((i * 3) + 2) + translation.getEntry(0));
+//			temp.setEntry(1, y_tilde.getEntry((i * 3) + 2) + translation.getEntry(1));
+//			temp.setEntry(2, z_tilde.getEntry((i * 3) + 2) + translation.getEntry(2));
+//
+//			// Set third vector of element
+//			m_geom.setVertex(elements[i].getEntry(2), temp);
+//		}
+
+		for (int i = 0; i < x_tilde.getSize(); i++) {
+			m_geom.setVertex(i, new PdVector(x_tilde.getEntry(i), y_tilde.getEntry(i), z_tilde.getEntry(i)));
+		}
 	}
 
 	private void applyTransformationMatrix(PdVector vector, PnSparseMatrix matrix, int index) {
@@ -302,18 +352,5 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 		vector.setEntry((index * 3), temp.getEntry(0));
 		vector.setEntry((index * 3) + 1, temp.getEntry(1));
 		vector.setEntry((index * 3) + 2, temp.getEntry(2));
-	}
-
-	private PiVector[] getSelectedElements() {
-		PiVector[] elements = m_geom.getElements();
-		ArrayList<PiVector> selectedElements = new ArrayList<>();
-		for(int i = 0; i < elements.length ; i++) {
-			if (elements[i].hasTag(PsObject.IS_SELECTED)) {
-				selectedElements.add(elements[i]);
-			}
-		}
-
-		PiVector[] array = new PiVector[selectedElements.size()];
-		return selectedElements.toArray(array);
 	}
 }
