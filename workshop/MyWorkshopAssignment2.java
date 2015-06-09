@@ -229,9 +229,9 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 		// TODO: add for loop for selected elements and apply transformation matrix
 		for(int i = 0; i < elements.length; i++) {
 			if (elements[i].hasTag(PsObject.IS_SELECTED)) {
-				applyTransformationMatrix(x_positional, a, i);
-				applyTransformationMatrix(y_positional, a, i);
-				applyTransformationMatrix(z_positional, a, i);
+				applyTransformationMatrix(g_x, a, i);
+				applyTransformationMatrix(g_y, a, i);
+				applyTransformationMatrix(g_z, a, i);
 			}
 		}
 
