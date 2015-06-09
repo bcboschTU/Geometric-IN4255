@@ -226,21 +226,34 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 		PsDebug.message(g_z.toString());
 
 		// Apply transformation matrix to the selected elements:
-		PiVector[] selectedElements = getSelectedElements();
-		PsDebug.message("Selected Elements: " + selectedElements.length);
-
 		// TODO: add for loop for selected elements and apply transformation matrix
+		for(int i = 0; i < elements.length; i++) {
+			if (elements[i].hasTag(PsObject.IS_SELECTED)) {
+				applyTransformationMatrix(x_positional, a, i);
+				applyTransformationMatrix(y_positional, a, i);
+				applyTransformationMatrix(z_positional, a, i);
+			}
+		}
 
 		// Calculate right side of equation G_tranposed * WeightMatrix * G * X_tilde = G_tranposed * WeightMatrix * g_tilde_x
 		PnSparseMatrix rightSideMatrix = PnSparseMatrix.multMatrices(G_transpose, M, null);
+		PsDebug.message("Resulting right side matrix:");
+		PsDebug.message(rightSideMatrix.toString());
 
 		// Complete right hand side computation of equation:
 		PdVector rightSideResult_x = PnSparseMatrix.rightMultVector(rightSideMatrix, g_x, null);
 		PdVector rightSideResult_y = PnSparseMatrix.rightMultVector(rightSideMatrix, g_y, null);
 		PdVector rightSideResult_z = PnSparseMatrix.rightMultVector(rightSideMatrix, g_z, null);
 
+		PsDebug.message("Resulting rightside vectors:");
+		PsDebug.message(rightSideResult_x.toString());
+		PsDebug.message(rightSideResult_y.toString());
+		PsDebug.message(rightSideResult_z.toString());
+
 		// Calculate left hand side matrix
 		PnSparseMatrix leftSideMatrix = PnSparseMatrix.multMatrices(G_transpose, PnSparseMatrix.multMatrices(M, G, null), null);
+		PsDebug.message("Resulting left side matrix:");
+		PsDebug.message(leftSideMatrix.toString());
 
 		PdVector x_tilde = new PdVector(rightSideResult_x.getSize());
 		PdVector y_tilde = new PdVector(rightSideResult_y.getSize());
@@ -248,13 +261,13 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 
 		PnBiconjugateGradient solver = new PnBiconjugateGradient();
 		// Solve for x_tilde:
-		solver.solve(leftSideMatrix, x_tilde, g_x);
+		solver.solve(leftSideMatrix, x_tilde, rightSideResult_x);
 
 		// Solve for y_tilde:
-		solver.solve(leftSideMatrix, y_tilde, g_y);
+		solver.solve(leftSideMatrix, y_tilde, rightSideResult_y);
 
 		// Solve for z_tilde
-		solver.solve(leftSideMatrix, z_tilde, g_z);
+		solver.solve(leftSideMatrix, z_tilde, rightSideResult_z);
 
 		// Resulting X coordinates
 		PsDebug.message("Resulting coordinates");
@@ -277,6 +290,18 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 		on other libraries including gcc and gfortran.
 		If the MUMPS library does not work on your system, you can use
 		jvx.numeric.PnBiconjugateGradient instead. However, this is less efficient (do not use too large meshes in this case).*/
+	}
+
+	private void applyTransformationMatrix(PdVector vector, PnSparseMatrix matrix, int index) {
+		PdVector temp = new PdVector(3);
+		temp.setEntry(0, vector.getEntry((index * 3)));
+		temp.setEntry(1, vector.getEntry((index * 3)+1));
+		temp.setEntry(2, vector.getEntry((index * 3)+2));
+
+		temp = PnSparseMatrix.rightMultVector(matrix, temp, null);
+		vector.setEntry((index * 3), temp.getEntry(0));
+		vector.setEntry((index * 3) + 1, temp.getEntry(1));
+		vector.setEntry((index * 3) + 2, temp.getEntry(2));
 	}
 
 	private PiVector[] getSelectedElements() {
