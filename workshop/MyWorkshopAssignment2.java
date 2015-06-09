@@ -193,79 +193,74 @@ public class MyWorkshopAssignment2 extends PjWorkshop {
 		PiVector[] elements = m_geom.getElements();
 		PdVector[] vertices = m_geom.getVertices();
 		// Calculate x,y and z gradient vector x_gradiant:
-		PdVector x_gradiant = new PdVector(3 * m_geom.getNumElements());
-		PdVector y_gradiant = new PdVector(3 * m_geom.getNumElements());
-		PdVector z_gradiant = new PdVector(3 * m_geom.getNumElements());
+		PdVector x_positional = new PdVector(3 * m_geom.getNumElements());
+		PdVector y_positional = new PdVector(3 * m_geom.getNumElements());
+		PdVector z_positional = new PdVector(3 * m_geom.getNumElements());
 		for (int i = 0; i < elements.length; i++) {
 			// Set transformed values into vector
-			x_gradiant.setEntry(i * 3, vertices[elements[i].getEntry(0)].getEntry(0));
-			x_gradiant.setEntry(i * 3 + 1, vertices[elements[i].getEntry(1)].getEntry(0));
-			x_gradiant.setEntry(i * 3 + 2, vertices[elements[i].getEntry(2)].getEntry(0));
+			x_positional.setEntry(i * 3, vertices[elements[i].getEntry(0)].getEntry(0));
+			x_positional.setEntry(i * 3 + 1, vertices[elements[i].getEntry(1)].getEntry(0));
+			x_positional.setEntry(i * 3 + 2, vertices[elements[i].getEntry(2)].getEntry(0));
 
-			y_gradiant.setEntry(i * 3, vertices[elements[i].getEntry(0)].getEntry(1));
-			y_gradiant.setEntry(i * 3 + 1, vertices[elements[i].getEntry(1)].getEntry(1));
-			y_gradiant.setEntry(i * 3 + 2, vertices[elements[i].getEntry(2)].getEntry(1));
+			y_positional.setEntry(i * 3, vertices[elements[i].getEntry(0)].getEntry(1));
+			y_positional.setEntry(i * 3 + 1, vertices[elements[i].getEntry(1)].getEntry(1));
+			y_positional.setEntry(i * 3 + 2, vertices[elements[i].getEntry(2)].getEntry(1));
 
-			z_gradiant.setEntry(i * 3, vertices[elements[i].getEntry(0)].getEntry(2));
-			z_gradiant.setEntry(i * 3 + 1, vertices[elements[i].getEntry(1)].getEntry(2));
-			z_gradiant.setEntry(i * 3 + 2, vertices[elements[i].getEntry(2)].getEntry(2));
+			z_positional.setEntry(i * 3, vertices[elements[i].getEntry(0)].getEntry(2));
+			z_positional.setEntry(i * 3 + 1, vertices[elements[i].getEntry(1)].getEntry(2));
+			z_positional.setEntry(i * 3 + 2, vertices[elements[i].getEntry(2)].getEntry(2));
 		}
 
 		PsDebug.message("Resulting positional values:");
-		PsDebug.message(x_gradiant.toString());
-		PsDebug.message(y_gradiant.toString());
-		PsDebug.message(z_gradiant.toString());
+		PsDebug.message(x_positional.toString());
+		PsDebug.message(y_positional.toString());
+		PsDebug.message(z_positional.toString());
+
+		PdVector g_x = PnSparseMatrix.rightMultVector(G, x_positional, null);
+		PdVector g_y = PnSparseMatrix.rightMultVector(G, y_positional, null);
+		PdVector g_z = PnSparseMatrix.rightMultVector(G, z_positional, null);
+
+		PsDebug.message("Resulting gradiant vectors:");
+		PsDebug.message(g_x.toString());
+		PsDebug.message(g_y.toString());
+		PsDebug.message(g_z.toString());
 
 		// Apply transformation matrix to the selected elements:
 		PiVector[] selectedElements = getSelectedElements();
 		PsDebug.message("Selected Elements: " + selectedElements.length);
 
+		// TODO: add for loop for selected elements and apply transformation matrix
+
 		// Calculate right side of equation G_tranposed * WeightMatrix * G * X_tilde = G_tranposed * WeightMatrix * g_tilde_x
 		PnSparseMatrix rightSideMatrix = PnSparseMatrix.multMatrices(G_transpose, M, null);
 
+		// Complete right hand side computation of equation:
+		PdVector rightSideResult_x = PnSparseMatrix.rightMultVector(rightSideMatrix, g_x, null);
+		PdVector rightSideResult_y = PnSparseMatrix.rightMultVector(rightSideMatrix, g_y, null);
+		PdVector rightSideResult_z = PnSparseMatrix.rightMultVector(rightSideMatrix, g_z, null);
+
+		// Calculate left hand side matrix
 		PnSparseMatrix leftSideMatrix = PnSparseMatrix.multMatrices(G_transpose, PnSparseMatrix.multMatrices(M, G, null), null);
 
-		PdVector g_tilde_x = new PdVector(m_geom.getNumElements()*3);
-		PdVector g_tilde_y = new PdVector(m_geom.getNumElements()*3);
-		PdVector g_tilde_z = new PdVector(m_geom.getNumElements()*3);
-		PiVector[] elements = m_geom.getElements();
-		// Calculate x gradient:
-		// deformation matrix a moet vermenigvuldigen met x, y en z waarden en niet met alleen x waarden
-		for (int i = 0; i < elements.length; i++) {
-			PdVector temp = new PdVector(3);
-			PdVector g_tilde_temp = new PdVector(3);
-			// Extract gradient from sparse matrix
-			temp.setEntry(0, G.getEntry(i, elements[i].getEntry(0)));
-			temp.setEntry(1, G.getEntry(i, elements[i].getEntry(1)));
-			temp.setEntry(2, G.getEntry(i, elements[i].getEntry(2)));
-			// Original gradient:
-			PsDebug.message(temp.toString());
-
-			// Apply matrix to x gradient
-			PnSparseMatrix.rightMultVector(a, temp, g_tilde_temp);
-			// Set transformed values into vector
-			g_tilde_x.setEntry(i * 3, g_tilde_temp.getEntry(0));
-			g_tilde_x.setEntry(i * 3 + 1, g_tilde_temp.getEntry(1));
-			g_tilde_x.setEntry(i * 3 + 2, g_tilde_temp.getEntry(2));
-		}
-		PsDebug.message("g_tilde_x ");
-		PsDebug.message(g_tilde_x.toString());
-
-		PdVector rightSideVector = PnSparseMatrix.rightMultVector(rightSideMatrix, g_tilde_x, null);
-		PdVector x_tilde = new PdVector(rightSideVector.getSize());
+		PdVector x_tilde = new PdVector(rightSideResult_x.getSize());
+		PdVector y_tilde = new PdVector(rightSideResult_y.getSize());
+		PdVector z_tilde = new PdVector(rightSideResult_z.getSize());
 
 		PnBiconjugateGradient solver = new PnBiconjugateGradient();
-		solver.solve(leftSideMatrix, x_tilde, g_tilde_x);
+		// Solve for x_tilde:
+		solver.solve(leftSideMatrix, x_tilde, g_x);
+
+		// Solve for y_tilde:
+		solver.solve(leftSideMatrix, y_tilde, g_y);
+
+		// Solve for z_tilde
+		solver.solve(leftSideMatrix, z_tilde, g_z);
 
 		// Resulting X coordinates
-		PsDebug.message("Resulting X coordinates");
+		PsDebug.message("Resulting coordinates");
 		PsDebug.message(x_tilde.toString());
-
-		// Original X coordinates
-		PsDebug.message("Original X coordinates");
-		PsDebug.message("" + m_geom.getVertex(elements[0].getEntry(0)).getEntry(0));
-		PsDebug.message("" + m_geom.getVertex(elements[0].getEntry(1)).getEntry(0));
-		PsDebug.message("" + m_geom.getVertex(elements[0].getEntry(2)).getEntry(0));
+		PsDebug.message(y_tilde.toString());
+		PsDebug.message(z_tilde.toString());
 
 		/*For solving the sparse linear systems (Task 2), you can use
 		dev6.numeric.PnMumpsSolver. This class offers an interface to the direct
